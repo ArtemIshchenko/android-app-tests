@@ -1,0 +1,57 @@
+{
+    "name": "asisch/thousands-tests",
+    "type": "project",
+    "license": "proprietary",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://gitlab.devserv.org/root/composer-repositories/raw/master/packages.json",
+            "secure-http": false
+        },
+        {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
+        }
+    ],
+    "require": {
+        "php": ">=7.3.0",
+        "yiisoft/yii2": "~2.0.14",
+        "yiisoft/yii2-bootstrap": "~2.0.0",
+        "yiisoft/yii2-swiftmailer": "~2.0.0 || ~2.1.0",
+        "root/libraries-helpers": "*",
+        "kartik-v/yii2-widget-select2": "*",
+        "kartik-v/yii2-widget-datetimepicker": "*",
+        "kartik-v/yii2-widget-datepicker": "@dev",
+        "kartik-v/yii2-date-range": "*",
+        "kartik-v/yii2-grid": "@dev",
+        "2amigos/yii2-ckeditor-widget" : "2.1.1",
+        "alhambr/yii2-rbac": "*",
+        "geoip2/geoip2": "~2.0",
+        "sinergi/browser-detector": "*",
+        "mobiledetect/mobiledetectlib": "^2.8"
+    },
+    "require-dev": {
+        "yiisoft/yii2-debug": "~2.0.0",
+        "yiisoft/yii2-gii": "~2.0.0",
+        "yiisoft/yii2-faker": "~2.0.0",
+        "codeception/base": "^2.2.3",
+        "codeception/verify": "~0.3.1"
+    },
+    "autoload": {
+        "classMap": [
+            "./common"
+        ]
+    },
+    "config": {
+        "process-timeout": 1800,
+        "secure-http": false,
+        "fxp-asset":{
+            "installer-paths": {
+                "npm-asset-library": "vendor/npm",
+                "bower-asset-library": "vendor/bower"
+            }
+        }
+    }
+}

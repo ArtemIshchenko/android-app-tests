@@ -1,35 +1,38 @@
 <?php
 
-/* @var $this yii\web\View */
-/* @var $form yii\bootstrap\ActiveForm */
-/* @var $model \common\models\LoginForm */
-
 use yii\helpers\Html;
-use yii\bootstrap\ActiveForm;
 
-$this->title = 'Login';
-$this->params['breadcrumbs'][] = $this->title;
+$this->title = 'Авторизация';
+
 ?>
-<div class="site-login">
-    <h1><?= Html::encode($this->title) ?></h1>
-
-    <p>Please fill out the following fields to login:</p>
-
+<div class="span100">
     <div class="row">
-        <div class="col-lg-5">
-            <?php $form = ActiveForm::begin(['id' => 'login-form']); ?>
-
-                <?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
-
+        <div class="panel panel-info"
+             style="width:350px;height:248px;position: absolute;left: 50%;top: 50%;margin: -224px 0 0 -175px;">
+            <div class="panel-heading"><?= Html::encode($this->title) ?></div>
+            <div class="panel-body">
+                <?php $form = \yii\widgets\ActiveForm::begin([
+                    'id' => 'login-form',
+                    'method' => 'post',
+                    'options' => ['class' => 'form-horizontal'],
+                    'fieldConfig' => [
+                        'template' => "{label}\n<div class=\"col-lg-9\">{input}</div>\n<div class=\"col-sm-offset-3 col-lg-9\">{error}\n{hint}</div>",
+                        'labelOptions' => ['class' => 'col-lg-3 control-label'],
+                    ],
+                ]); ?>
+                <?= $form->field($model, 'nickname') ?>
                 <?= $form->field($model, 'password')->passwordInput() ?>
-
-                <?= $form->field($model, 'rememberMe')->checkbox() ?>
-
-                <div class="form-group">
-                    <?= Html::submitButton('Login', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+                <div class="form-group field-adm-password_hash">
+                    <label class="col-lg-3 control-label" for="adm-enter"></label>
+                    <div class="col-lg-9"
+                         style="text-align:right;"><?= Html::submitButton('Вход', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?></div>
+                    <div class="col-sm-offset-3 col-lg-9">
+                        <div class="help-block"></div>
+                    </div>
                 </div>
-
-            <?php ActiveForm::end(); ?>
+                <?php \yii\widgets\ActiveForm::end(); ?>
+            </div>
         </div>
     </div>
 </div>
+

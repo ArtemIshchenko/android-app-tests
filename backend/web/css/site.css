@@ -14,6 +14,11 @@ body {
     padding: 70px 15px 20px;
 }
 
+
+.container {
+    width: 1336px!important;
+}
+
 .footer {
     height: 60px;
     background-color: #f5f5f5;
@@ -72,8 +77,7 @@ a.desc:after {
     content: "\e156";
 }
 
-.grid-view th,
-.grid-view td:last-child {
+.grid-view td {
     white-space: nowrap;
 }
 

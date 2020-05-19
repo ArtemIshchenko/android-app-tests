@@ -93,6 +93,39 @@ class DeeplinkRecord extends ActiveRecord
     }
 
     /**
+     * @description Поиск по выбраным полям
+     * @param $params
+     * @return ActiveDataProvider
+     */
+    public function search($params)
+    {
+        $isActive = isset($params['is_active']) ? Type_Cast::toUInt($params['is_active']) : -1;
+        $mode = isset($params['mode']) ? Type_Cast::toUInt($params['mode']) : -1;
+
+        $query = self::find();
+        if ($isActive > -1) {
+            $query->andWhere(['is_active' => $isActive]);
+        }
+        if ($mode > -1) {
+            $query->andWhere(['mode' => $mode]);
+        }
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'sort'=> [
+                'defaultOrder' => ['id' => SORT_ASC]
+            ],
+            'pagination' => [
+                'pageSize' => self::PAGE_LIMIT,
+            ],
+        ]);
+        if (!($this->load($params))) {
+            return $dataProvider;
+        }
+        return $dataProvider;
+    }
+
+    /**
      * @description Активность
      * @return array
      */
@@ -110,7 +143,7 @@ class DeeplinkRecord extends ActiveRecord
     public static function getModes() {
         return [
             self::MODE['warming'] => 'Прогревочный',
-            self::MODE['image'] => 'Имеджевый',
+            self::MODE['image'] => 'Имиджевый',
             self::MODE['fighting'] => 'Боевой',
         ];
     }

@@ -53,8 +53,13 @@ class TestRecord extends ActiveRecord
             if (!empty($this->$attribute)) {
                 $attr = $this->$attribute;
                 $structure = [];
-                eval("\$structure = $attr;");
-                if (!empty($structure)) {
+                try {
+                    eval("\$structure = $attr;");
+                } catch (\Throwable $e) {
+                    $this->addError($attribute, 'Неверная структура массива - проверьте наличие всех скобок и запятые после закрывающих скобок');
+                }
+
+                if (!$this->hasErrors() && !empty($structure)) {
                     if (!isset($structure['id']) || empty($structure['id'])) {
                         $this->addError($attribute, 'Неверная структура массива - заполните поле id теста');
                     }
@@ -130,6 +135,35 @@ class TestRecord extends ActiveRecord
             'created_at' => 'Дата создания',
             'updated_at' => 'Дата обновления',
         ];
+    }
+
+    /**
+     * @description Поиск по выбраным полям
+     * @param $params
+     * @return ActiveDataProvider
+     */
+    public function search($params)
+    {
+        $isActive = isset($params['is_active']) ? Type_Cast::toUInt($params['is_active']) : -1;
+
+        $query = self::find();
+        if ($isActive > -1) {
+            $query->andWhere(['is_active' => $isActive]);
+        }
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'sort'=> [
+                'defaultOrder' => ['id' => SORT_ASC]
+            ],
+            'pagination' => [
+                'pageSize' => self::PAGE_LIMIT,
+            ],
+        ]);
+        if (!($this->load($params))) {
+            return $dataProvider;
+        }
+        return $dataProvider;
     }
 
     /**

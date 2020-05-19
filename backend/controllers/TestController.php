@@ -22,10 +22,20 @@ class TestController extends BackController
 
     /**
      * @property-description Тесты
+     * @param integer $type
      */
-    public function actionTests() {
+    public function actionTests($type = 0) {
+        $params = [];
+        switch($type) {
+            case 1:
+                $params = ['is_active' => TestRecord::IS_ACTIVE];
+                break;
+            case 2:
+                $params = ['is_active' => TestRecord::IS_NOT_ACTIVE];
+                break;
+        }
         $model = new TestRecord();
-        $dataProvider = $model->search(\Yii::$app->request->get());
+        $dataProvider = $model->search(array_merge(\Yii::$app->request->get(), $params));
         return $this->render('tests', [
             'model' => $model,
             'dataProvider' => $dataProvider
@@ -34,17 +44,25 @@ class TestController extends BackController
 
     /**
      * @property-description Создание теста
+     * @param integer $type
      * @return string
      */
-    public function actionTestAdd() {
+    public function actionTestAdd($type = 0) {
         $model = new TestRecord();
         $model->setScenario('add');
+        switch($type) {
+            case 1:
+            default:
+                $model->is_active = TestRecord::IS_ACTIVE;
+                break;
+            case 2:
+                $model->is_active = TestRecord::IS_NOT_ACTIVE;
+                break;
+        }
 
         if ($model->load(\Yii::$app->request->post())) {
             if ($model->save()) {
-                $this->redirect(Url::toRoute(['test/tests']));
-            } else {
-                $model->convReverse();
+                $this->redirect(Url::toRoute(['test/tests', 'type' => $type]));
             }
         }
 
@@ -54,10 +72,11 @@ class TestController extends BackController
     /**
      * @property-description Редактирование теста
      * @param int $id
+     * @param integer $type
      * @return string
      * @throws HttpException
      */
-    public function actionTestUpdate($id) {
+    public function actionTestUpdate($id, $type = 0) {
         $model = TestRecord::findOne($id);
         $model->convReverse();
         if(is_null($model) || empty($model)) {
@@ -66,9 +85,7 @@ class TestController extends BackController
         $model->setScenario('update');
         if ($model->load(\Yii::$app->request->post())) {
             if ($model->save()) {
-                $this->redirect(Url::toRoute(['test/tests']));
-            } else {
-                $model->convReverse();
+                $this->redirect(Url::toRoute(['test/tests', 'type' => $type]));
             }
         }
 
@@ -127,10 +144,29 @@ class TestController extends BackController
 
     /**
      * @property-description Диплинки
+     * @param integer $type
      */
-    public function actionIndex() {
+    public function actionIndex($type = 0) {
+        $params = [];
+        switch($type) {
+            case 1:
+                $params = ['is_active' => DeeplinkRecord::IS_ACTIVE];
+                break;
+            case 2:
+                $params = ['is_active' => DeeplinkRecord::IS_NOT_ACTIVE];
+                break;
+            case 3:
+                $params = ['mode' => DeeplinkRecord::MODE['warming']];
+                break;
+            case 4:
+                $params = ['mode' => DeeplinkRecord::MODE['image']];
+                break;
+            case 5:
+                $params = ['mode' => DeeplinkRecord::MODE['fighting']];
+                break;
+        }
         $model = new DeeplinkRecord();
-        $dataProvider = $model->search(\Yii::$app->request->get());
+        $dataProvider = $model->search(array_merge(\Yii::$app->request->get(), $params));
         return $this->render('index', [
             'model' => $model,
             'dataProvider' => $dataProvider
@@ -139,18 +175,36 @@ class TestController extends BackController
 
     /**
      * @property-description Создание диплинка
+     * @param integer $type
      * @return string
      */
-    public function actionDeeplinkAdd() {
+    public function actionDeeplinkAdd($type = 0) {
         $model = new DeeplinkRecord();
         $model->setScenario('add');
-        $model->is_active = DeeplinkRecord::IS_ACTIVE;
-        $model->mode = DeeplinkRecord::MODE['warming'];
+        switch($type) {
+            case 1:
+            default:
+                $model->is_active = DeeplinkRecord::IS_ACTIVE;
+                $model->mode = DeeplinkRecord::MODE['warming'];
+                break;
+            case 2:
+                $model->is_active = DeeplinkRecord::IS_NOT_ACTIVE;
+                $model->mode = DeeplinkRecord::MODE['warming'];
+                break;
+            case 4:
+                $model->is_active = DeeplinkRecord::IS_ACTIVE;
+                $model->mode = DeeplinkRecord::MODE['image'];
+                break;
+            case 5:
+                $model->is_active = DeeplinkRecord::IS_ACTIVE;
+                $model->mode = DeeplinkRecord::MODE['fighting'];
+                break;
+        }
 
         if ($model->load(\Yii::$app->request->post())) {
             $model->deeplink_hash = DeeplinkRecord::getHash();
             if ($model->save()) {
-                $this->redirect(Url::toRoute(['test/index']));
+                $this->redirect(Url::toRoute(['test/index', 'type' => $type]));
             }
         }
 
@@ -160,17 +214,18 @@ class TestController extends BackController
     /**
      * @property-description Редактирование диплинка
      * @param int $id
+     * @param integer $type
      * @return string
      * @throws HttpException
      */
-    public function actionDeeplinkUpdate($id) {
+    public function actionDeeplinkUpdate($id, $type = 0) {
         $model = DeeplinkRecord::findOne($id);
         if(is_null($model) || empty($model)) {
             throw new HttpException(404, "Диплинк не найден", 404);
         }
         $model->setScenario('update');
         if ($model->load(\Yii::$app->request->post()) && $model->save()) {
-            $this->redirect(Url::toRoute(['test/index']));
+            $this->redirect(Url::toRoute(['test/index', 'type' => $type]));
         }
 
         return $this->render('deeplink-update', ['model' => $model]);

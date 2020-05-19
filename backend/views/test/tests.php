@@ -8,10 +8,11 @@ use yii\helpers\Url;
 $this->title = 'Тесты';
 $this->params['breadcrumbs'][] = $this->title;
 
+$type = \Yii::$app->request->get('type',0);
 $addButton = '';
 if (Yii::$app->rbacManager->checkAccess('test/tests')) {
     $addButton = '<div class="pull-right mtop20">';
-    $addButton .= Html::a('<i class="fa fa-plus"></i> Добавить', Url::toRoute(['test/test-add']), ['class' => 'btn btn-success']);
+    $addButton .= Html::a('<i class="fa fa-plus"></i> Добавить', Url::toRoute(['test/test-add', 'type' => $type]), ['class' => 'btn btn-success']);
     $addButton .= '</div>';
 }
 $addButton .= '<div class="clearfix"></div><div class="ptop10"></div>';
@@ -19,6 +20,30 @@ $addButton .= '<div class="clearfix"></div><div class="ptop10"></div>';
 
 <div class="content">
     <div class="nav-tabs-custom">
+        <div class="pall10"></div>
+        <?= Nav::widget([
+            'items' => [
+                [
+                    'label' => 'Все',
+                    'url' => Url::toRoute(['test/tests', 'type' => 0]),
+                    'active' => $type == 0 ? true : false,
+                ],
+                [
+                    'label' => 'Активные',
+                    'url' => Url::toRoute(['test/tests', 'type' => 1]),
+                    'active' => $type == 1 ? true : false,
+                ],
+                [
+                    'label' => 'Не активные',
+                    'url' => Url::toRoute(['test/tests', 'type' => 2]),
+                    'active' => $type == 2 ? true : false,
+                ],
+            ],
+            'encodeLabels' => false,
+            'options' => ['class' => 'nav-tabs'],
+        ]);
+        ?>
+        <div class="pall10"></div>
         <div class="tab-content">
             <div class="">
                 <?= GridView::widget([
@@ -85,9 +110,9 @@ $addButton .= '<div class="clearfix"></div><div class="ptop10"></div>';
                             'contentOptions' => ['style' => 'width:40px;'],
                             'template' => "{update}",
                             'buttons' => [
-                                'update' => function($url, $model){
+                                'update' => function($url, $model) use($type) {
                                     if (Yii::$app->rbacManager->checkAccess('test/test-update')) {
-                                        return '<a href="' . Url::toRoute(['/test/test-update', 'id' => $model->id]) . '" class="fa fa-pencil fa-2x" title="Редактирование"></a>';
+                                        return '<a href="' . Url::toRoute(['/test/test-update', 'id' => $model->id, 'type' => $type]) . '" class="fa fa-pencil fa-2x" title="Редактирование"></a>';
                                     }
                                 },
                             ]

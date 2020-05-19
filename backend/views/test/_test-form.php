@@ -1,8 +1,5 @@
 <?php
-use kartik\select2\Select2;
-use common\models\db\AdvertisingSystemRecord;
 use yii\helpers\Html;
-use yii\web\JsExpression;
 
 ?>
 <div class="content">
@@ -25,36 +22,37 @@ use yii\web\JsExpression;
                 <kbd>answers</kbd> - массив ответов
             </div>
             <div>
-                <kbd>number, text</kbd> - номер (целое число, по порядку) и текст вопроса в массиве answers соответственно
+                <kbd>number, text</kbd> - номер (целое число, по порядку) и текст ответа в массиве answers соответственно
             </div>
             <div>
-                <kbd>isSignal</kbd> - флаг, является данный ответ сигнальным, возможные значения: 0 и 1
+                <kbd>isSignal</kbd> - флаг, является ли данный ответ сигнальным, возможные значения: 0 или 1
             </div>
             <div>
-                Пример массива : <br>
-                <textarea rows="24" cols="45" disabled>
+                <br>
+                <b>Пример массива :</b> <br>
+                <textarea rows="24" cols="60" disabled>
                     [
-                        "id" => 1,
-                        "title" => "тест",
-                        "description" => "описание",
-                        "questions" => [
-                            [
-                                "number" => 1,
-                                "text" => "вопрос",
-                                "answers" => [
-                                [
-                                    "number" => 1,
-                                    "text" => "ответ1",
-                                    "isSignal" => 1
-                                ],
-                                [
-                                    "number" => 2,
-                                    "text" => "ответ2",
-                                    "isSignal" => 1
-                                ],
-                                ]
-                            ],
-                        ]
+                            "id" => 1,
+                            "title" => "тест",
+                            "description" => "описание",
+                            "questions" => [
+                                    [
+                                            "number" => 1,
+                                            "text" => "вопрос",
+                                            "answers" => [
+                                                    [
+                                                             "number" => 1,
+                                                            "text" => "ответ1",
+                                                            "isSignal" => 1
+                                                    ],
+                                                    [
+                                                            "number" => 2,
+                                                            "text" => "ответ2",
+                                                            "isSignal" => 1
+                                                    ],
+                                            ]
+                                    ],
+                            ]
                     ]
                 </textarea>
             </div>

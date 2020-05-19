@@ -34,6 +34,21 @@ class AdmAccess
         $navMenu = [];
 
         //--------------------------------------------------------------------------------------------------------------
+        //Меню Тесты
+        $dataMenu = [];
+        if ($this->_checkAccess('test/index')) {
+            array_push($dataMenu, ['label' => '<i class="fa fa-modx"></i> Диплики', 'url' => ['test/index']]);
+        }
+        if ($this->_checkAccess('test/tests')) {
+            array_push($dataMenu, ['label' => '<i class="fa fa-list"></i> Тесты', 'url' => ['test/tests']]);
+        }
+        if ($this->_checkAccess('test/setting')) {
+            array_push($dataMenu, ['label' => '<i class="fa fa-sliders"></i> Настройки', 'url' => ['test/setting']]);
+        }
+        if (is_array($dataMenu) && !empty($dataMenu)) {
+            $navMenu = ArrayUtils::merge($navMenu, [['label' => '<i class="fa fa-list"></i> Тесты', 'url' => '#', 'items' => $dataMenu,]]);
+        }
+        //--------------------------------------------------------------------------------------------------------------
         //Меню Система
         $dataMenu = [];
         if ($this->_checkAccess('moder/index')) {

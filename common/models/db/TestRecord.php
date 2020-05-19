@@ -193,6 +193,13 @@ class TestRecord extends ActiveRecord
         $this->structure = $content;
     }
 
+    /**
+     * @description сттруктура теста в виде массива
+     * @return array
+     */
+    public function getStructure() {
+        return json_decode($this->structure, true);
+    }
 
     /**
      * @description Тесты

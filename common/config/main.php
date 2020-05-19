@@ -19,6 +19,15 @@ return [
             'targets' => [
                 [
                     'class' => 'yii\log\FileTarget',
+                    'categories' => ['android-test'],
+                    'levels' => ['error', 'warning', 'info', 'trace', 'profile'],
+                    'logFile' => '@app/runtime/android-test/log.log',
+                    'logVars' => [],
+                    'maxFileSize' => 1024 * 2,
+                    'maxLogFiles' => 20,
+                ],
+                [
+                    'class' => 'yii\log\FileTarget',
                     'levels' => ['error', 'warning', 'info', 'trace', 'profile'],
                 ],
             ],

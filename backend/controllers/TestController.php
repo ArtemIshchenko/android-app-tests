@@ -147,8 +147,11 @@ class TestController extends BackController
         $model->is_active = DeeplinkRecord::IS_ACTIVE;
         $model->mode = DeeplinkRecord::MODE['warming'];
 
-        if ($model->load(\Yii::$app->request->post()) && $model->save()) {
-            $this->redirect(Url::toRoute(['test/index']));
+        if ($model->load(\Yii::$app->request->post())) {
+            $model->deeplink_hash = DeeplinkRecord::getHash();
+            if ($model->save()) {
+                $this->redirect(Url::toRoute(['test/index']));
+            }
         }
 
         return $this->render('deeplink-add', ['model' => $model]);

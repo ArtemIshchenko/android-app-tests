@@ -72,6 +72,9 @@ class TestRecord extends ActiveRecord
                     if (!isset($structure['questions']) || empty($structure['questions'])) {
                         $this->addError($attribute, 'Неверная структура массива - заполните поле questions теста');
                     }
+                    if (!isset($structure['imageAnswer']) || empty($structure['imageAnswer'])) {
+                        $this->addError($attribute, 'Неверная структура массива - заполните поле imageAnswer теста');
+                    }
                     if (!$this->hasErrors()) {
                         foreach ($structure['questions'] as $i => $question) {
                             if (!isset($question['number']) || empty($question['number'])) {
@@ -98,7 +101,6 @@ class TestRecord extends ActiveRecord
                             }
                         }
                         if (!$this->hasErrors()) {
-
                             if (preg_match('/\]\s*\[/m', $attr)) {
                                 $this->addError($attribute, 'Неверная структура массива - пропущены запятые после закрывающих скобок');
                             }
@@ -194,6 +196,8 @@ class TestRecord extends ActiveRecord
             $content .= "\t" . '"title" => "' . $title . "\",\n";
             $description = isset($structure['description']) ? $structure['description'] : '';
             $content .= "\t" . '"description" => "' . $description . "\",\n";
+            $imageAnswer = isset($structure['imageAnswer']) ? $structure['imageAnswer'] : '';
+            $content .= "\t" . '"imageAnswer" => "' . $imageAnswer . "\",\n";
 
             $content .= "\t" . '"questions" => ' . "[\n";
             if (isset($structure['questions']) && !empty($structure['questions'])) {

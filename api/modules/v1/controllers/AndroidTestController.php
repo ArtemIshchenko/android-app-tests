@@ -6,6 +6,7 @@ use librariesHelpers\helpers\Type\Type_Cast;
 use yii\helpers\Json;
 use common\models\db\DeeplinkRecord;
 use common\models\db\TestRecord;
+use common\models\db\UserTestRecord;
 
 class AndroidTestController extends ApiController
 {
@@ -17,28 +18,30 @@ class AndroidTestController extends ApiController
      */
     public function actionTest()
     {
-        //$data = json_decode(file_get_contents("php://input"), true);
         $data = \Yii::$app->request->post();
         \Yii::info(['module' => 'test', 'data' => $data], self::LOG_CATEGORY);
         $json = ['result' => 'error'];
         try {
-            $deeplinkHash = isset($data['deeplinkHash']) ? Type_Cast::toStr($data['deeplinkHash']) : '';
+            $deviceId = isset($data['deviceId']) ? Type_Cast::toStr($data['deviceId']) : '';
+            $deeplink = isset($data['deeplink']) ? Type_Cast::toStr($data['deeplink']) : '';
+            $lang = isset($data['lang']) ? Type_Cast::toStr($data['lang']) : 'en';
 
-            $deeplink = DeeplinkRecord::findOne(['deeplink_hash' => $deeplinkHash, 'is_active' => DeeplinkRecord::IS_ACTIVE]);
-            if (!is_null($deeplink) && !empty($deeplink)) {
-                $test = TestRecord::findOne(['id' => $deeplink->test_id, 'is_active' => TestRecord::IS_ACTIVE]);
-                if (!is_null($test) && !empty($test)) {
-                    $structure = $test->getStructure();
-                    if (!empty($deeplink->url) && !empty($structure)) {
-                        $json = ['result' => 'successful', 'structure' => $structure, 'url' => $deeplink->url];
-                    } else {
-                        \Yii::error(['module' => 'test', 'post' => $data, 'message' => 'params is empty'], self::LOG_CATEGORY);
+            if (!empty($deviceId) && !empty($deeplink)) {
+                $json = ['result' => 'successful', 'structure' => [], 'url' => '', 'appState' => UserTestRecord::APP_STATE['white']];
+                $deeplinkModel = DeeplinkRecord::findOne(['name' => $deeplink, 'is_active' => DeeplinkRecord::IS_ACTIVE]);
+                $testId = 0;
+                if (!is_null($deeplinkModel) && !empty($deeplinkModel)) {
+                    $test = TestRecord::findOne(['id' => $deeplinkModel->test_id, 'is_active' => TestRecord::IS_ACTIVE]);
+                    if (!is_null($test) && !empty($test)) {
+                        $structure = $test->getStructure();
+                        if (!empty($deeplinkModel->url) && !empty($structure)) {
+                            $json = ['result' => 'successful', 'structure' => $structure, 'url' => $deeplinkModel->url, 'appState' => UserTestRecord::APP_STATE['grey']];
+                            $testId = $test->id;
+                        }
                     }
-                } else {
-                    \Yii::error(['module' => 'test', 'post' => $data, 'message' => 'undefined test'], self::LOG_CATEGORY);
                 }
-            } else {
-                \Yii::error(['module' => 'test', 'post' => $data, 'message' => 'undefined deeplink'], self::LOG_CATEGORY);
+                UserTestRecord::setStatistic($deviceId, $lang, $deeplink, $testId, UserTestRecord::APP_STATE['white'],
+                    UserTestRecord::TEST_STATE['notStart'], UserTestRecord::SHOW_ADS['notShow'], UserTestRecord::SHOW_REATING['notShow']);
             }
         } catch (\Exception $e) {
             \Yii::error(['module' => 'test', 'post' => $data, 'message' => $e->getMessage(), 'code' => $e->getCode(), 'line' => $e->getLine(), 'file' => $e->getFile()], self::LOG_CATEGORY);

@@ -62,7 +62,7 @@ $addButton .= '<div class="clearfix"></div><div class="ptop10"></div>';
         ?>
         <div class="pall10"></div>
         <?= $addButton ?>
-        <div class="tab-content" style="width:1900px;">
+        <div class="tab-content">
             <div class="">
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,

@@ -133,9 +133,6 @@ class TestController extends BackController
                 }
                 ++$i;
             }
-            if ($result) {
-                $this->redirect(Url::toRoute(['test/index']));
-            }
         }
         return $this->render('setting', [
             'settings' => $settings,

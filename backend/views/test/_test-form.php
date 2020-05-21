@@ -13,6 +13,9 @@ use yii\helpers\Html;
                 <kbd>id, title, description</kbd> - идентификатор (целое число, по порядку), заголовок и описание теста соответственно
             </div>
             <div>
+                <kbd>imageAnswer</kbd> - вариант ответа для имиджевого режима, а также если не выбран ни один "сигнальный" ответ
+            </div>
+            <div>
                 <kbd>questions</kbd> - массив вопросов теста
             </div>
             <div>
@@ -30,11 +33,12 @@ use yii\helpers\Html;
             <div>
                 <br>
                 <b>Пример массива :</b> <br>
-                <textarea rows="24" cols="60" disabled>
+                <textarea rows="24" cols="130" disabled>
                     [
                             "id" => 1,
                             "title" => "тест",
                             "description" => "описание",
+                            "imageAnswer" => "Вариант ответа для имиджевого режима, а также если не выбран ни один сигнальный ответ",
                             "questions" => [
                                     [
                                             "number" => 1,

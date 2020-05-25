@@ -18,7 +18,8 @@ class AndroidTestController extends ApiController
      */
     public function actionTest()
     {
-        $data = \Yii::$app->request->post();
+        //$data = \Yii::$app->request->post();
+        $data = json_decode(file_get_contents("php://input"), true);
         \Yii::info(['module' => 'test', 'data' => $data], self::LOG_CATEGORY);
         $json = ['result' => 'error'];
         try {
@@ -40,6 +41,7 @@ class AndroidTestController extends ApiController
                         }
                     }
                 }
+                \Yii::info(['module' => 'test', 'data' => $structure], self::LOG_CATEGORY);
                 UserTestRecord::setStatistic($deviceId, $lang, $deeplink, $testId, UserTestRecord::APP_STATE['white'],
                     UserTestRecord::TEST_STATE['notStart'], UserTestRecord::SHOW_ADS['notShow'], UserTestRecord::SHOW_REATING['notShow']);
             }

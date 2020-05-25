@@ -31,6 +31,15 @@ use yii\helpers\Html;
                 <kbd>isSignal</kbd> - флаг, является ли данный ответ сигнальным, возможные значения: 0 или 1
             </div>
             <div>
+                <kbd>rating</kbd> - рейтинг ответа (количесвто баллов за ответ)
+            </div>
+            <div>
+                <kbd>results</kbd> - массив результатов теста
+            </div>
+            <div>
+                <kbd>min, max, text</kbd> - минимальное и максимальное количество баллов и текст результата соответственно
+            </div>
+            <div>
                 <br>
                 <b>Пример массива :</b> <br>
                 <textarea rows="24" cols="130" disabled>
@@ -38,7 +47,7 @@ use yii\helpers\Html;
                             "id" => 1,
                             "title" => "тест",
                             "description" => "описание",
-                            "imageAnswer" => "Вариант ответа для имиджевого режима, а также если не выбран ни один сигнальный ответ",
+                            "imageAnswer" => "Вариант ответа для имиджевого режима",
                             "questions" => [
                                     [
                                             "number" => 1,
@@ -47,16 +56,30 @@ use yii\helpers\Html;
                                                     [
                                                              "number" => 1,
                                                             "text" => "ответ1",
-                                                            "isSignal" => 1
+                                                            "isSignal" => 1,
+                                                            "rating" => 1
                                                     ],
                                                     [
                                                             "number" => 2,
                                                             "text" => "ответ2",
-                                                            "isSignal" => 1
+                                                            "isSignal" => 1,
+                                                            "rating" => 2
                                                     ],
                                             ]
                                     ],
-                            ]
+                            ],
+                            "results" => [
+                                    [
+                                            "min" => 50,
+                                            "max" => 0,
+                                            "text" => "результат1"
+                                    ],
+                                    [
+                                            "min" => 12,
+                                            "max" => 49,
+                                            "text" => "результат2"
+                                    ],
+	                        ]
                     ]
                 </textarea>
             </div>

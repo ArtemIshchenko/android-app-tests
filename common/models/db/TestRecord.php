@@ -75,6 +75,9 @@ class TestRecord extends ActiveRecord
                     if (!isset($structure['imageAnswer']) || empty($structure['imageAnswer'])) {
                         $this->addError($attribute, 'Неверная структура массива - заполните поле imageAnswer теста');
                     }
+                    if (!isset($structure['results']) || empty($structure['results'])) {
+                        $this->addError($attribute, 'Неверная структура массива - заполните поле results теста');
+                    }
                     if (!$this->hasErrors()) {
                         foreach ($structure['questions'] as $i => $question) {
                             if (!isset($question['number']) || empty($question['number'])) {
@@ -97,19 +100,38 @@ class TestRecord extends ActiveRecord
                                     if (!isset($answer['isSignal'])) {
                                         $this->addError($attribute, 'Неверная структура массива - заполните поле isSignal ответа ' . ($j + 1) . ' вопроса ' . ($i + 1) . ' теста');
                                     }
+                                    if (!isset($answer['rating'])) {
+                                        $this->addError($attribute, 'Неверная структура массива - заполните поле rating ответа ' . ($j + 1) . ' вопроса ' . ($i + 1) . ' теста');
+                                    }
                                 }
                             }
                         }
-                        if (!$this->hasErrors()) {
-                            if (preg_match('/\]\s*\[/m', $attr)) {
-                                $this->addError($attribute, 'Неверная структура массива - пропущены запятые после закрывающих скобок');
+                    }
+
+                    if (!$this->hasErrors()) {
+                        foreach ($structure['results'] as $k => $result) {
+                            if (!isset($result['min']) || (!is_numeric($result['min']))) {
+                                $this->addError($attribute, 'Неверная структура массива - заполните поле min результата теста ' . ($k + 1));
+                            }
+                            if (!isset($result['max']) || (!is_numeric($result['max']))) {
+                                $this->addError($attribute, 'Неверная структура массива - заполните поле max результата теста ' . ($k + 1));
+                            }
+                            if (!isset($result['text']) || empty($result['text'])) {
+                                $this->addError($attribute, 'Неверная структура массива - заполните поле text результата теста ' . ($k + 1));
                             }
                         }
-                        if (!$this->hasErrors()) {
-                            $this->$attribute = json_encode($structure);
+                    }
+
+                    if (!$this->hasErrors()) {
+                        if (preg_match('/\]\s*\[/m', $attr)) {
+                            $this->addError($attribute, 'Неверная структура массива - пропущены запятые после закрывающих скобок');
                         }
                     }
+                    if (!$this->hasErrors()) {
+                        $this->$attribute = json_encode($structure);
+                    }
                 }
+
             }
         }
     }
@@ -217,7 +239,9 @@ class TestRecord extends ActiveRecord
                             $answerText = isset($answer['text']) ? $answer['text'] : '';
                             $content .= "\t\t\t\t\t" . '"text" => "' . $answerText . "\",\n";
                             $answerIsSignal = isset($answer['isSignal']) ? $answer['isSignal'] : false;
-                            $content .= "\t\t\t\t\t" . '"isSignal" => ' . $answerIsSignal . "\n";
+                            $content .= "\t\t\t\t\t" . '"isSignal" => ' . $answerIsSignal . ",\n";
+                            $answerRating = isset($answer['rating']) ? $answer['rating'] : '';
+                            $content .= "\t\t\t\t\t" . '"rating" => ' . $answerRating . "\n";
                             $content .= "\t\t\t\t],\n";
                         }
                     }
@@ -225,7 +249,23 @@ class TestRecord extends ActiveRecord
                     $content .= "\t\t],\n";
                 }
             }
+            $content .= "\t],\n";
+
+            $content .= "\t" . '"results" => ' . "[\n";
+            if (isset($structure['results']) && !empty($structure['results'])) {
+                foreach ($structure['results'] as $result) {
+                    $content .= "\t\t" . "[\n";
+                    $resultMin = isset($result['min']) ? $result['min'] : '';
+                    $content .= "\t\t\t" . '"min" => ' . $resultMin . ",\n";
+                    $resultMax = isset($result['max']) ? $result['max'] : '';
+                    $content .= "\t\t\t" . '"max" => ' . $resultMax . ",\n";
+                    $resultText = isset($result['text']) ? $result['text'] : '';
+                    $content .= "\t\t\t" . '"text" => "' . $resultText . "\",\n";
+                    $content .= "\t\t],\n";
+                }
+            }
             $content .= "\t]\n";
+
             $content .= "]";
         }
         $this->structure = $content;

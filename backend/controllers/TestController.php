@@ -252,6 +252,6 @@ class TestController extends BackController
     }
 
     public function actionTest() {
-
+            \common\models\db\UserTestRecord::setStatistic('d87d685a2577da23', 'en', 'sdasasd', 0, 0 ,0,0,0);
     }
 }

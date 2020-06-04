@@ -177,7 +177,7 @@ class TestController extends BackController
      */
     public function actionDeeplinkAdd($type = 0) {
         $model = new DeeplinkRecord();
-        $model->setScenario('add');
+        $model->setScenario('white-add');
         switch($type) {
             case 1:
             default:
@@ -199,6 +199,9 @@ class TestController extends BackController
         }
 
         if ($model->load(\Yii::$app->request->post())) {
+            if (in_array($model->mode, [DeeplinkRecord::MODE['fighting'], DeeplinkRecord::MODE['image']])) {
+                $model->setScenario('grey-add');
+            }
             $model->deeplink_hash = DeeplinkRecord::getHash();
             if ($model->save()) {
                 $this->redirect(Url::toRoute(['test/index', 'type' => $type]));
@@ -220,9 +223,16 @@ class TestController extends BackController
         if(is_null($model) || empty($model)) {
             throw new HttpException(404, "Диплинк не найден", 404);
         }
-        $model->setScenario('update');
-        if ($model->load(\Yii::$app->request->post()) && $model->save()) {
-            $this->redirect(Url::toRoute(['test/index', 'type' => $type]));
+        $model->setScenario('white-update');
+        if ($model->load(\Yii::$app->request->post())) {
+            if (in_array($model->mode, [DeeplinkRecord::MODE['fighting'], DeeplinkRecord::MODE['image']])) {
+                $model->setScenario('grey-update');
+            }
+            echo $model->mode;
+            echo $model->scenario;
+            if ($model->save()) {
+                $this->redirect(Url::toRoute(['test/index', 'type' => $type]));
+            }
         }
 
         return $this->render('deeplink-update', ['model' => $model]);
@@ -252,6 +262,10 @@ class TestController extends BackController
     }
 
     public function actionTest() {
-            \common\models\db\UserTestRecord::setStatistic('d87d685a2577da23', 'en', 'sdasasd', 0, 0 ,0,0,0);
+            //\common\models\db\UserTestRecord::setStatistic('d87d685a2577da23', 'en', 'sdasasd', 0, 0 ,0,0,0);
+        $s = \common\models\db\SettingRecord::getSettingList(\common\models\db\SettingRecord::SECTION['main']);
+        echo '<pre>';print_r($s);
+        echo \common\models\db\SettingRecord::getValByName('showAdvertising', \common\models\db\SettingRecord::SECTION['main']);
+        echo \common\models\db\SettingRecord::getValByName('showCommentGpWidget', \common\models\db\SettingRecord::SECTION['main']);
     }
 }

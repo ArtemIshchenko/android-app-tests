@@ -16,6 +16,9 @@ use yii\helpers\Html;
                 <kbd>imageAnswer</kbd> - вариант ответа для имиджевого режима, а также если не выбран ни один "сигнальный" ответ
             </div>
             <div>
+                <kbd>timerSetting</kbd> - уставка таймера для отображения кнопки результатов, сек
+            </div>
+            <div>
                 <kbd>questions</kbd> - массив вопросов теста
             </div>
             <div>
@@ -48,6 +51,7 @@ use yii\helpers\Html;
                             "title" => "тест",
                             "description" => "описание",
                             "imageAnswer" => "Вариант ответа для имиджевого режима",
+                            "timerSetting" => 3700,
                             "questions" => [
                                     [
                                             "number" => 1,

@@ -49,15 +49,17 @@ class DeeplinkRecord extends ActiveRecord
     public function rules()
     {
         return [
-            [['test_id', 'app_test_id', 'deeplink_hash', 'name'], 'required', 'on' => ['add', 'update']],
-            [['deeplink_hash'], 'required', 'on' => ['add']],
-            [['name', 'description'], 'string', 'max' => 256, 'on' => ['add', 'update']],
-            [['url', 'deeplink_hash'], 'string', 'on' => ['add', 'update']],
-            [['name', 'description', 'url'], 'trim', 'on' => ['add', 'update']],
-            [['url'], 'url', 'validSchemes' => ['https', 'http'], 'on' => ['add', 'update']],
-            [['is_active', 'mode'], 'integer', 'on' => ['add', 'update']],
-            [['is_active'], 'default', 'value' => self::IS_ACTIVE, 'on' => ['add']],
-            [['mode'], 'default', 'value' => self::MODE['warming'], 'on' => ['add']],
+            [['deeplink_hash', 'name'], 'required', 'on' => ['white-add', 'white-update', 'grey-add', 'grey-update']],
+            [['app_test_id'], 'required', 'enableClientValidation' => false, 'on' => ['white-add', 'white-update']],
+            [['test_id'], 'required', 'enableClientValidation' => false, 'on' => ['grey-add', 'grey-update']],
+            [['app_test_id', 'test_id'], 'integer', 'on' => ['white-add', 'white-update', 'grey-add', 'grey-update']],
+            [['name', 'description'], 'string', 'max' => 256, 'on' => ['white-add', 'white-update', 'grey-add', 'grey-update']],
+            [['url', 'deeplink_hash'], 'string', 'on' => ['white-add', 'white-update', 'grey-add', 'grey-update']],
+            [['name', 'description', 'url'], 'trim', 'on' => ['white-add', 'white-update', 'grey-add', 'grey-update']],
+            [['url'], 'url', 'validSchemes' => ['https', 'http'], 'on' => ['white-add', 'white-update', 'grey-add', 'grey-update']],
+            [['is_active', 'mode'], 'integer', 'on' => ['white-add', 'white-update', 'grey-add', 'grey-update']],
+            [['is_active'], 'default', 'value' => self::IS_ACTIVE, 'on' => ['white-add', 'grey-add']],
+            [['mode'], 'default', 'value' => self::MODE['warming'], 'on' => ['white-add', 'grey-add']],
             [['is_active'], 'integer', 'on' => ['change-active']],
         ];
     }
@@ -79,8 +81,8 @@ class DeeplinkRecord extends ActiveRecord
     {
         return [
             'id' => '#',
-            'test_id' => 'Тест',
-            'app_test_id' => 'Тест приложения (для прогревочного режима)',
+            'test_id' => 'Серый тест',
+            'app_test_id' => 'Белый тест',
             'deeplink_hash' => 'Хеш диплинка',
             'name' => 'Наименование',
             'description' => 'Описание',

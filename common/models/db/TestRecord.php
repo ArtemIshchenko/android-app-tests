@@ -27,7 +27,28 @@ class TestRecord extends ActiveRecord
     const IS_NOT_ACTIVE = 0;
     const IS_ACTIVE = 1;
 
-    const APP_TESTS = [1 => 'В порядке ли ваши нервы?', 2 => 'ЧТО О ВАС ДУМАЮТ ДРУГИЕ ЛЮДИ'];
+    const APP_TESTS = [
+        1 => 'В ПОРЯДКЕ ЛИ ВАШИ НЕРВЫ?',
+        2 => 'ЧТО О ВАС ДУМАЮТ ДРУГИЕ ЛЮДИ',
+        3 => 'БОЛЬШАЯ ЛЮБОВЬ ИЛИ ЛЕГКОЕ УВЛЕЧЕНИЕ?',
+        4 => 'ТЕСТ "ВАЖНОСТЬ СЕКСА ДЛЯ ВАС"',
+        5 => 'УЗНАЙТЕ, КАКИЕ У ВАС СКРЫТЫЕ ТАЛАНТЫ',
+        6 => 'КАК СИЛЬНО ВЫ СЕБЯ ЛЮБИТЕ',
+        7 => 'КАК СИЛЬНО ВЫ СЕБЯ ЛЮБИТЕ',
+        8 => 'Тест на зависимость от телевидения',
+        9 => 'ТЕСТ НА ПЕДАНТИЧНОСТЬ',
+        10 => 'ТЕСТ "НАСКОЛЬКО ВЫ ТЕРПИМЫ К УБЕЖДЕНИЯМ ДРУГИХ"',
+        11 => 'ТЕСТ "СТРАСТЬ К ПУТЕШЕСТВИЯМ"',
+        12 => 'ТЕСТ "СПОСОБНЫ ЛИ ВЫ БЫТЬ ПОБЕДИТЕЛЕМ"',
+        13 => 'ТЕСТ "СКЛОННОСТЬ К САМОРАЗРУШЕНИЮ"',
+        14 => 'ТЕСТ НА РЕВНИВОСТЬ',
+        15 => 'Тест на рассеянность',
+        16 => 'Тест "Подходит ли вам место работы?"',
+        17 => 'Тест "Подвержены ли Вы стрессу?"',
+        18 => 'Тест "На сколько вы застенчивы?"',
+        19 => 'ТЕСТ «Умеете ли вы себя контролировать?»',
+        20 => 'Тест «Психологическая устойчивость» для мужчин и парней',
+    ];
 
     public static function tableName()
     {
@@ -74,6 +95,9 @@ class TestRecord extends ActiveRecord
                     }
                     if (!isset($structure['imageAnswer']) || empty($structure['imageAnswer'])) {
                         $this->addError($attribute, 'Неверная структура массива - заполните поле imageAnswer теста');
+                    }
+                    if (!isset($structure['timerSetting']) || empty($structure['timerSetting'])) {
+                        $this->addError($attribute, 'Неверная структура массива - заполните поле timerSetting теста');
                     }
                     if (!isset($structure['results']) || empty($structure['results'])) {
                         $this->addError($attribute, 'Неверная структура массива - заполните поле results теста');
@@ -220,6 +244,8 @@ class TestRecord extends ActiveRecord
             $content .= "\t" . '"description" => "' . $description . "\",\n";
             $imageAnswer = isset($structure['imageAnswer']) ? $structure['imageAnswer'] : '';
             $content .= "\t" . '"imageAnswer" => "' . $imageAnswer . "\",\n";
+            $timerSetting = isset($structure['timerSetting']) ? $structure['timerSetting'] : 0;
+            $content .= "\t" . '"timerSetting" => ' . $timerSetting . ",\n";
 
             $content .= "\t" . '"questions" => ' . "[\n";
             if (isset($structure['questions']) && !empty($structure['questions'])) {

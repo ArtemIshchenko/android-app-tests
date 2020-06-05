@@ -4,6 +4,7 @@ namespace backend\controllers;
 use common\models\db\DeeplinkRecord;
 use common\models\db\TestRecord;
 use common\models\db\SettingRecord;
+use common\models\db\UserPushRecord;
 use backend\components\own\baseController\BackController;
 use librariesHelpers\helpers\Type\Type_Cast;
 use yii\data\ArrayDataProvider;
@@ -19,7 +20,9 @@ use yii\base\Model;
  */
 class TestController extends BackController
 {
+    public $apiToken = 'AAAAsYyEZfA:APA91bGDetC7UNQzqynxzfZRVBYhJYTdrvP8zZPMFsKeO5_Qgw-Frt_VTymDT1iWOY0Qi5uUIifhtqFSKXFvrTU2Y9QCdH2dpVRG76onyANhz0dAEsqy-t2GzYu_3CQ7zLEK1SBx2xdt';
 
+    public $apiUrl = 'https://fcm.googleapis.com/fcm/send';
     /**
      * @property-description Тесты
      * @param integer $type
@@ -178,6 +181,10 @@ class TestController extends BackController
     public function actionDeeplinkAdd($type = 0) {
         $model = new DeeplinkRecord();
         $model->setScenario('white-add');
+        $model->app_test_id = 0;
+        $model->test_id = 0;
+        $model->url = '';
+        $model->description = '';
         switch($type) {
             case 1:
             default:
@@ -262,10 +269,64 @@ class TestController extends BackController
     }
 
     public function actionTest() {
-            //\common\models\db\UserTestRecord::setStatistic('d87d685a2577da23', 'en', 'sdasasd', 0, 0 ,0,0,0);
-        $s = \common\models\db\SettingRecord::getSettingList(\common\models\db\SettingRecord::SECTION['main']);
-        echo '<pre>';print_r($s);
-        echo \common\models\db\SettingRecord::getValByName('showAdvertising', \common\models\db\SettingRecord::SECTION['main']);
-        echo \common\models\db\SettingRecord::getValByName('showCommentGpWidget', \common\models\db\SettingRecord::SECTION['main']);
+        $text = 'Просмотрите их сейчас';
+        $title = 'Результаты теста готовы';
+
+
+        $timezone = 'Europe/Kiev';
+        date_default_timezone_set($timezone);
+
+        $userPushes = UserPushRecord::find()
+            ->where(['is_handler' => UserPushRecord::NOT_IS_HANDLER])
+            ->andWhere(['<', 'push_at', time()])
+            ->orderBy(['id' => SORT_ASC])
+            ->limit(50)
+            ->all();
+
+        if (!is_null($userPushes) && !empty($userPushes)) {
+            foreach ($userPushes as $userPush) {
+                $sendParams = self::prepareSendMessage($userPush['token'], $title, $text);
+                $this->sendMessage($sendParams);
+                $userPush->setScenario('set-handler');
+                $userPush->is_handler = UserPushRecord::IS_HANDLER;
+                $userPush->save();
+            }
+        }
+    }
+    private static function prepareSendMessage($token, $title, $body)
+    {
+
+        $fields = [
+            'to' => $token,
+            'content_available' => true,
+            'notification' => [
+                'title' => $title,
+                'body' => $body,
+            ],
+            'data' => [
+                'click_action' => 'fcm.action.Ttests',
+            ],
+            'priority' => 'high'
+        ];
+        return $fields;
+    }
+
+    private function sendMessage($params)
+    {
+        $headers = [
+            'Authorization' => 'key=' . $this->apiToken,
+            'Content-Type: application/json',
+        ];
+
+        $ch = curl_init($this->apiUrl);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $return = curl_exec($ch);
+        print $return;
+        curl_close($ch);
     }
 }

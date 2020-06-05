@@ -58,6 +58,7 @@ class DeeplinkRecord extends ActiveRecord
             [['name', 'description', 'url'], 'trim', 'on' => ['white-add', 'white-update', 'grey-add', 'grey-update']],
             [['url'], 'url', 'validSchemes' => ['https', 'http'], 'on' => ['white-add', 'white-update', 'grey-add', 'grey-update']],
             [['is_active', 'mode'], 'integer', 'on' => ['white-add', 'white-update', 'grey-add', 'grey-update']],
+            [['test_id', 'app_test_id'], 'default', 'value' => 0, 'on' => ['white-add', 'grey-add']],
             [['is_active'], 'default', 'value' => self::IS_ACTIVE, 'on' => ['white-add', 'grey-add']],
             [['mode'], 'default', 'value' => self::MODE['warming'], 'on' => ['white-add', 'grey-add']],
             [['is_active'], 'integer', 'on' => ['change-active']],

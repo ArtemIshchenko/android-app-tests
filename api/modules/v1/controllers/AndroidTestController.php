@@ -8,13 +8,14 @@ use common\models\db\DeeplinkRecord;
 use common\models\db\TestRecord;
 use common\models\db\UserTestRecord;
 use common\models\db\SettingRecord;
+use common\models\db\UserPushRecord;
 
 class AndroidTestController extends ApiController
 {
 
     const LOG_CATEGORY = "android-test";
 
-    /**Сохранение емейла и пинкода пользователя
+    /**Данные теста
      * @throws \yii\base\ExitException
      */
     public function actionTest()
@@ -73,6 +74,33 @@ class AndroidTestController extends ApiController
             }
         } catch (\Exception $e) {
             \Yii::error(['module' => 'test', 'post' => $data, 'message' => $e->getMessage(), 'code' => $e->getCode(), 'line' => $e->getLine(), 'file' => $e->getFile()], self::LOG_CATEGORY);
+        }
+        header('Content-Type: application/json');
+        print json_encode($json);exit;
+    }
+
+    /**Данные пользователя
+     * @throws \yii\base\ExitException
+     */
+    public function actionUser()
+    {
+        //$data = \Yii::$app->request->post();
+        $data = json_decode(file_get_contents("php://input"), true);
+        \Yii::info(['module' => 'user', 'data' => $data], self::LOG_CATEGORY);
+        $json = ['result' => 'error'];
+        try {
+            $deviceId = isset($data['deviceId']) ? Type_Cast::toStr($data['deviceId']) : '';
+            $token = isset($data['token']) ? Type_Cast::toStr($data['token']) : '';
+            $testId = isset($data['testId']) ? Type_Cast::toUInt($data['testId']) : 0;
+            $pushAt = isset($data['pushAt']) ? Type_Cast::toUInt($data['pushAt']) : 0;
+
+            if (!empty($deviceId) && !empty($token) && ($testId > 0)) {
+                if (UserPushRecord::setPush($deviceId, $token, $testId, $pushAt)) {
+                    $json = ['result' => 'successful'];
+                }
+            }
+        } catch (\Exception $e) {
+            \Yii::error(['module' => 'usert', 'post' => $data, 'message' => $e->getMessage(), 'code' => $e->getCode(), 'line' => $e->getLine(), 'file' => $e->getFile()], self::LOG_CATEGORY);
         }
         header('Content-Type: application/json');
         print json_encode($json);exit;

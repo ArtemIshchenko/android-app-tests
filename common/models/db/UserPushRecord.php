@@ -89,6 +89,7 @@ class UserPushRecord extends ActiveRecord
         $userPush->token = $token;
         $userPush->test_id = $testId;
         $userPush->push_at = $pushAt;
+        $userPush->is_handler = 0;
         return $userPush->save();
     }
 }

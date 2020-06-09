@@ -20,7 +20,7 @@ class AndroidPushController extends Controller
         $text = 'Просмотрите их сейчас';
         $title = 'Результаты теста готовы';
 
-
+print 'push';
         $timezone = 'Europe/Kiev';
         date_default_timezone_set($timezone);
 
@@ -62,20 +62,19 @@ class AndroidPushController extends Controller
 
     private function sendMessage($params)
     {
-        $headers = [
-            'Authorization' => 'key=' . $this->apiToken,
-            'Content-Type: application/json',
-        ];
 
+        $headers[] = 'Content-Type: application/json';
+        $headers[] = 'Authorization: key='. $this->apiToken;
+
+        $json = json_encode($params);
         $ch = curl_init($this->apiUrl);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
+        curl_setopt($ch, CURLOPT_URL, $this->apiUrl);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST,"POST");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+        curl_setopt($ch, CURLOPT_HTTPHEADER,$headers);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $return = curl_exec($ch);
-        print $return;
+        print_r($return);
         curl_close($ch);
     }
 

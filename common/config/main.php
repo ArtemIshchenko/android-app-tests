@@ -12,7 +12,7 @@ return [
             'servers'=>[
                 ['host' => 'localhost', 'port' => 11211, 'weight' => 60],
             ],
-            'keyPrefix' => 'tt2'
+            'keyPrefix' => 'tt3'
         ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,

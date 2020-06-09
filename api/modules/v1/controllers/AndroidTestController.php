@@ -9,6 +9,7 @@ use common\models\db\TestRecord;
 use common\models\db\UserTestRecord;
 use common\models\db\SettingRecord;
 use common\models\db\UserPushRecord;
+use common\models\db\LogRecord;
 
 class AndroidTestController extends ApiController
 {
@@ -28,7 +29,7 @@ class AndroidTestController extends ApiController
             $deviceId = isset($data['deviceId']) ? Type_Cast::toStr($data['deviceId']) : '';
             $deeplink = isset($data['deeplink']) ? Type_Cast::toStr($data['deeplink']) : '';
             $lang = isset($data['lang']) ? Type_Cast::toStr($data['lang']) : 'en';
-
+            LogRecord::register($deviceId, $deeplink, $lang);
             if (!empty($deviceId) && !empty($deeplink)) {
                 $appState = UserTestRecord::APP_STATE['white'];
                 $structureInit = [
@@ -94,8 +95,10 @@ class AndroidTestController extends ApiController
             $testId = isset($data['testId']) ? Type_Cast::toUInt($data['testId']) : 0;
             $pushAt = isset($data['pushAt']) ? Type_Cast::toUInt($data['pushAt']) : 0;
 
-            if (!empty($deviceId) && !empty($token) && ($testId > 0)) {
-                if (UserPushRecord::setPush($deviceId, $token, $testId, $pushAt)) {
+            if (!empty($deviceId) && !empty($token)) {
+                LogRecord::register($deviceId, '', '', $token, $testId);
+                $res = UserPushRecord::setPush($deviceId, $token, $testId, $pushAt);
+                if ($res) {
                     $json = ['result' => 'successful'];
                 }
             }

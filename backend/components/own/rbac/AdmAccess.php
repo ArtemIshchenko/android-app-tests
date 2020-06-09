@@ -45,6 +45,9 @@ class AdmAccess
         if ($this->_checkAccess('test/setting')) {
             array_push($dataMenu, ['label' => '<i class="fa fa-sliders"></i> Настройки', 'url' => ['test/setting']]);
         }
+        if ($this->_checkAccess('test/log')) {
+            array_push($dataMenu, ['label' => '<i class="fa fa-pencil"></i> Логи', 'url' => ['test/log']]);
+        }
         if (is_array($dataMenu) && !empty($dataMenu)) {
             $navMenu = ArrayUtils::merge($navMenu, [['label' => '<i class="fa fa-list"></i> Тесты', 'url' => '#', 'items' => $dataMenu,]]);
         }

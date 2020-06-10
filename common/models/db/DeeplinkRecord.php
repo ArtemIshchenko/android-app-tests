@@ -164,4 +164,15 @@ class DeeplinkRecord extends ActiveRecord
         return $code;
     }
 
+    /**
+     * @description Удаление приставки
+     * @param string $deeplink
+     * @return string
+     */
+    public static function removeSuffix($deeplink) {
+        $suffix = 'com.thousandstests://';
+        $deeplink = str_replace($suffix, "", $deeplink);
+        return $deeplink;
+    }
+
 }

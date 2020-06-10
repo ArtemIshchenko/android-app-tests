@@ -11,10 +11,9 @@ $this->title = 'Логи';
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
-
+<div class="pall10"></div>
 <div class="content">
     <div class="nav-tabs-custom">
-        <div class="pall10"></div>
         <div class="tab-content">
             <div class="">
                 <?= GridView::widget([

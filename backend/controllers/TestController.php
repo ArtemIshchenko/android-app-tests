@@ -51,23 +51,31 @@ class TestController extends BackController
      * @return string
      */
     public function actionTestAdd($type = 0) {
-        $model = new TestRecord();
-        $model->setScenario('add');
-        switch($type) {
-            case 1:
-            default:
-                $model->is_active = TestRecord::IS_ACTIVE;
-                break;
-            case 2:
-                $model->is_active = TestRecord::IS_NOT_ACTIVE;
-                break;
-        }
-
-        if ($model->load(\Yii::$app->request->post())) {
-            if ($model->save()) {
-                $this->redirect(Url::toRoute(['test/tests', 'type' => $type]));
+        $isCheck = \Yii::$app->request->post('check', false);
+         if (!$isCheck) {
+            $model = new TestRecord();
+            $model->setScenario('add');
+            switch ($type) {
+                case 1:
+                default:
+                    $model->is_active = TestRecord::IS_ACTIVE;
+                    break;
+                case 2:
+                    $model->is_active = TestRecord::IS_NOT_ACTIVE;
+                    break;
             }
-        }
+
+            if ($model->load(\Yii::$app->request->post())) {
+                if ($model->save()) {
+                    $this->redirect(Url::toRoute(['test/tests', 'type' => $type]));
+                }
+            }
+        } else {
+             $model = new TestRecord();
+             $model->setScenario('check');
+             $model->load(\Yii::$app->request->post());
+             $model->validate();
+         }
 
         return $this->render('test-add', ['model' => $model]);
     }
@@ -80,16 +88,24 @@ class TestController extends BackController
      * @throws HttpException
      */
     public function actionTestUpdate($id, $type = 0) {
-        $model = TestRecord::findOne($id);
-        $model->convReverse();
-        if(is_null($model) || empty($model)) {
-            throw new HttpException(404, "Тест не найден", 404);
-        }
-        $model->setScenario('update');
-        if ($model->load(\Yii::$app->request->post())) {
-            if ($model->save()) {
-                $this->redirect(Url::toRoute(['test/tests', 'type' => $type]));
+        $isCheck = \Yii::$app->request->post('check', false);
+        if (!$isCheck) {
+            $model = TestRecord::findOne($id);
+            $model->convReverse();
+            if (is_null($model) || empty($model)) {
+                throw new HttpException(404, "Тест не найден", 404);
             }
+            $model->setScenario('update');
+            if ($model->load(\Yii::$app->request->post())) {
+                if ($model->save()) {
+                    $this->redirect(Url::toRoute(['test/tests', 'type' => $type]));
+                }
+            }
+        } else {
+            $model = new TestRecord();
+            $model->setScenario('check');
+            $model->load(\Yii::$app->request->post());
+            $model->validate();
         }
 
         return $this->render('test-update', ['model' => $model]);

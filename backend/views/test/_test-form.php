@@ -106,9 +106,15 @@ use yii\helpers\Html;
 
                 <div class="panel panel-default">
                     <div class="panel-body">
+                        <?= $form->field($model, 'structForCheck')->textarea(['rows' => 30])
+                            ->hint('') ?>
+                    </div>
+                    <div class="pull-right">
+                        <?= Html::submitButton('<i class="fa fa-save"></i> Проверка массива', ['class' => 'btn btn-info', 'id' => 'check-test-tests', 'name' => 'check', 'value' => 1]) ?><br>
+                    </div>
+                    <div class="panel-body">
                         <?= $form->field($model, 'name')->textInput()
                             ->hint('') ?>
-
                         <?= $form->field($model, 'structure')->textarea(['rows' => 30])
                             ->hint('') ?>
 

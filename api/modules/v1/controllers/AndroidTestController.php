@@ -39,34 +39,42 @@ class AndroidTestController extends ApiController
                     'imageAnswer' => '',
                     'timerSetting' => 0,
                     'questions' => [
-                        'number' => 0,
-                        'text' => '',
-                        'answers' => [
+                        [
                             'number' => 0,
                             'text' => '',
-                            'isSignal' => 0,
-                            'rating' => 0,
+                            'answers' => [
+                                [
+                                    'number' => 0,
+                                    'text' => '',
+                                    'isSignal' => 0,
+                                    'rating' => 0,
+                                ]
+                            ]
                         ]
                     ]
                 ];
                 $showAdvertising = SettingRecord::getValByName('showAdvertising', SettingRecord::SECTION['main']);
                 $showCommentGpWidget = SettingRecord::getValByName('showCommentGpWidget', SettingRecord::SECTION['main']);
-                $json = ['result' => 'successful', 'structure' => $structureInit, 'whiteTestId' => '', 'url' => '', 'mode' => '', 'appState' => $appState, 'showAdvertising' => $showAdvertising, 'showCommentGpWidget' => $showCommentGpWidget];
+                $json = ['result' => 'successful', 'structure' => $structureInit, 'whiteTestId' => 0, 'url' => '', 'mode' => 0, 'appState' => $appState, 'showAdvertising' => $showAdvertising, 'showCommentGpWidget' => $showCommentGpWidget];
+                $deeplink = DeeplinkRecord::removeSuffix($deeplink);
                 $deeplinkModel = DeeplinkRecord::findOne(['name' => $deeplink, 'is_active' => DeeplinkRecord::IS_ACTIVE]);
                 $testId = 0;
                 $structure = [];
                 if (!is_null($deeplinkModel) && !empty($deeplinkModel)) {
-                    $test = TestRecord::findOne(['id' => $deeplinkModel->test_id, 'is_active' => TestRecord::IS_ACTIVE]);
-                    if (!is_null($test) && !empty($test)) {
+                    if ($deeplinkModel->mode != DeeplinkRecord::MODE['warming']) {
+                        $test = TestRecord::findOne(['id' => $deeplinkModel->test_id, 'is_active' => TestRecord::IS_ACTIVE]);
                         $structure = $test->getStructure();
                         $appState = UserTestRecord::APP_STATE['grey'];
-                        if ($deeplinkModel->mode == DeeplinkRecord::MODE['warming']) {
-                            $appState = UserTestRecord::APP_STATE['white'];
-                        }
-                        if (!empty($deeplinkModel->url) && !empty($structure)) {
-                            $json = ['result' => 'successful', 'structure' => $structure, 'whiteTestId' => $deeplinkModel->app_test_id, 'url' => $deeplinkModel->url, 'mode' => $deeplinkModel->mode, 'appState' => $appState, 'showAdvertising' => $showAdvertising, 'showCommentGpWidget' => $showCommentGpWidget];
-                            $testId = $test->id;
-                        }
+                        $whiteTestId = 0;
+                    } else {
+                        $structure = $structureInit;
+                        $appState = UserTestRecord::APP_STATE['white'];
+                        $whiteTestId = $deeplinkModel->app_test_id;
+                    }
+
+                    if (!empty($structure)) {
+                        $json = ['result' => 'successful', 'structure' => $structure, 'whiteTestId' => $whiteTestId, 'url' => $deeplinkModel->url, 'mode' => $deeplinkModel->mode, 'appState' => $appState, 'showAdvertising' => $showAdvertising, 'showCommentGpWidget' => $showCommentGpWidget];
+                        $testId = $test->id;
                     }
                 }
                 \Yii::info(['module' => 'test', 'data' => $structure], self::LOG_CATEGORY);

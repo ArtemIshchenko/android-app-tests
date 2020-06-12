@@ -26,6 +26,7 @@ use yii\helpers\ArrayHelper;
 class LogRecord extends ActiveRecord
 {
 
+    const PAGE_LIMIT1 = 100;
 
     public static function tableName()
     {
@@ -89,6 +90,42 @@ class LogRecord extends ActiveRecord
         $log->test_id = $testId;
 
         return $log->save();
+    }
+
+    /**
+     * @description Поиск по выбраным полям
+     * @param $params
+     * @return ActiveDataProvider
+     */
+    public function search($params)
+    {
+        $dateFrom = isset($params['dateFrom']) ? Type_Cast::toUInt($params['dateFrom']) : -1;
+        $dateTo = isset($params['dateTo']) ? Type_Cast::toUInt($params['dateTo']) : -1;
+        $type = isset($params['type']) ? Type_Cast::toUInt($params['type']) : -1;
+
+        $query = self::find();
+        if (($dateFrom > -1) && ($dateTo > -1)) {
+            $query->where(['BETWEEN', 'created_at', $dateFrom, $dateTo]);
+        }
+        if ($type == 1) {
+            $query->andWhere(['<>', 'token', '']);
+        } else {
+            $query->andWhere(['token' => '']);
+        }
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'sort'=> [
+                'defaultOrder' => ['created_at' => SORT_DESC]
+            ],
+            'pagination' => [
+                'pageSize' => self::PAGE_LIMIT1,
+            ],
+        ]);
+        if (!($this->load($params))) {
+            return $dataProvider;
+        }
+        return $dataProvider;
     }
 
 }

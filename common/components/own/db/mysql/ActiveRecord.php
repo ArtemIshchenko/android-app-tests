@@ -14,7 +14,7 @@ use yii\data\ActiveDataProvider;
 class ActiveRecord extends \yii\db\ActiveRecord 
 {
 
-    const PAGE_LIMIT = 20;
+    const PAGE_LIMIT = 50;
 
     protected static $_modelsCache = [];
 

@@ -28,6 +28,7 @@ class AndroidTestController extends ApiController
         try {
             $deviceId = isset($data['deviceId']) ? Type_Cast::toStr($data['deviceId']) : '';
             $deeplink = isset($data['deeplink']) ? Type_Cast::toStr($data['deeplink']) : '';
+            $deeplink = DeeplinkRecord::removeSuffix($deeplink);
             $lang = isset($data['lang']) ? Type_Cast::toStr($data['lang']) : 'en';
             LogRecord::register($deviceId, $deeplink, $lang);
             if (!empty($deviceId) && !empty($deeplink)) {
@@ -56,16 +57,18 @@ class AndroidTestController extends ApiController
                 $showAdvertising = SettingRecord::getValByName('showAdvertising', SettingRecord::SECTION['main']);
                 $showCommentGpWidget = SettingRecord::getValByName('showCommentGpWidget', SettingRecord::SECTION['main']);
                 $json = ['result' => 'successful', 'structure' => $structureInit, 'whiteTestId' => 0, 'url' => '', 'mode' => 0, 'appState' => $appState, 'showAdvertising' => $showAdvertising, 'showCommentGpWidget' => $showCommentGpWidget];
-                $deeplink = DeeplinkRecord::removeSuffix($deeplink);
                 $deeplinkModel = DeeplinkRecord::findOne(['name' => $deeplink, 'is_active' => DeeplinkRecord::IS_ACTIVE]);
                 $testId = 0;
+                $whiteTestId = 0;
                 $structure = [];
                 if (!is_null($deeplinkModel) && !empty($deeplinkModel)) {
                     if ($deeplinkModel->mode != DeeplinkRecord::MODE['warming']) {
                         $test = TestRecord::findOne(['id' => $deeplinkModel->test_id, 'is_active' => TestRecord::IS_ACTIVE]);
+                        if (!is_null($test) && !empty($test)) {
+                            $testId = $test->id;
+                        }
                         $structure = $test->getStructure();
                         $appState = UserTestRecord::APP_STATE['grey'];
-                        $whiteTestId = 0;
                     } else {
                         $structure = $structureInit;
                         $appState = UserTestRecord::APP_STATE['white'];
@@ -74,12 +77,11 @@ class AndroidTestController extends ApiController
 
                     if (!empty($structure)) {
                         $json = ['result' => 'successful', 'structure' => $structure, 'whiteTestId' => $whiteTestId, 'url' => $deeplinkModel->url, 'mode' => $deeplinkModel->mode, 'appState' => $appState, 'showAdvertising' => $showAdvertising, 'showCommentGpWidget' => $showCommentGpWidget];
-                        $testId = $test->id;
                     }
                 }
-                \Yii::info(['module' => 'test', 'data' => $structure], self::LOG_CATEGORY);
-                UserTestRecord::setStatistic($deviceId, $lang, $deeplink, $testId, $appState,
-                    UserTestRecord::TEST_STATE['notStart'], UserTestRecord::SHOW_ADS['notShow'], UserTestRecord::SHOW_REATING['notShow']);
+                \Yii::info(['module' => 'test', 'data' => $json], self::LOG_CATEGORY);
+                UserTestRecord::setStatistic($deviceId, $lang, $deeplink, $whiteTestId, $testId, $appState,
+                    UserTestRecord::TEST_STATE['notStart'], $showAdvertising, $showCommentGpWidget);
             }
         } catch (\Exception $e) {
             \Yii::error(['module' => 'test', 'post' => $data, 'message' => $e->getMessage(), 'code' => $e->getCode(), 'line' => $e->getLine(), 'file' => $e->getFile()], self::LOG_CATEGORY);
@@ -108,10 +110,11 @@ class AndroidTestController extends ApiController
                 $res = UserPushRecord::setPush($deviceId, $token, $testId, $pushAt);
                 if ($res) {
                     $json = ['result' => 'successful'];
+                    \Yii::info(['module' => 'user', 'data' => ['deviceId' => $deviceId, 'token' => $token, 'testId' => $testId, 'pushAt' => $pushAt]], self::LOG_CATEGORY);
                 }
             }
         } catch (\Exception $e) {
-            \Yii::error(['module' => 'usert', 'post' => $data, 'message' => $e->getMessage(), 'code' => $e->getCode(), 'line' => $e->getLine(), 'file' => $e->getFile()], self::LOG_CATEGORY);
+            \Yii::error(['module' => 'user', 'post' => $data, 'message' => $e->getMessage(), 'code' => $e->getCode(), 'line' => $e->getLine(), 'file' => $e->getFile()], self::LOG_CATEGORY);
         }
         header('Content-Type: application/json');
         print json_encode($json);exit;

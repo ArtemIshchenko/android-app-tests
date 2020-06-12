@@ -6,6 +6,8 @@ use common\models\db\TestRecord;
 use common\models\db\SettingRecord;
 use common\models\db\LogRecord;
 use backend\components\own\baseController\BackController;
+use backend\models\form\StatisticAndroidFilter;
+use backend\components\own\statistic\StatisticAndroidSystem;
 use librariesHelpers\helpers\Type\Type_Cast;
 use yii\data\ArrayDataProvider;
 use yii\helpers\Url;
@@ -20,9 +22,9 @@ use yii\base\Model;
  */
 class TestController extends BackController
 {
-    public $apiToken = 'AAAAsYyEZfA:APA91bGDetC7UNQzqynxzfZRVBYhJYTdrvP8zZPMFsKeO5_Qgw-Frt_VTymDT1iWOY0Qi5uUIifhtqFSKXFvrTU2Y9QCdH2dpVRG76onyANhz0dAEsqy-t2GzYu_3CQ7zLEK1SBx2xdt';
+//    public $apiToken = 'AAAAsYyEZfA:APA91bGDetC7UNQzqynxzfZRVBYhJYTdrvP8zZPMFsKeO5_Qgw-Frt_VTymDT1iWOY0Qi5uUIifhtqFSKXFvrTU2Y9QCdH2dpVRG76onyANhz0dAEsqy-t2GzYu_3CQ7zLEK1SBx2xdt';
 
-    public $apiUrl = 'https://fcm.googleapis.com/fcm/send';
+//    public $apiUrl = 'https://fcm.googleapis.com/fcm/send';
     /**
      * @property-description Тесты
      * @param integer $type
@@ -286,18 +288,47 @@ class TestController extends BackController
 
     /**
      * @property-description Логи
+     * @param integer $type
      */
-    public function actionLog() {
+    public function actionLog($type = 0) {
+        $params = [];
+        switch($type) {
+            case 0:
+                $params = ['type' => 0];
+                break;
+            case 1:
+                $params = ['type' => 1];
+                break;
+        }
+        $statisticFilter = new StatisticAndroidFilter();
+        $statisticFilter->load(\Yii::$app->request->get());
+        //$pageSize = $statisticFilter->pageSize;
+
+        $data = StatisticAndroidSystem::logs($statisticFilter, $type);
+        $dateTimestamp = $statisticFilter->getDateTimestamp();
+        $params['dateFrom'] = $dateTimestamp['dateFrom'];
+        $params['dateTo'] = $dateTimestamp['dateTo'];
+
         $model = new LogRecord();
-        $dataProvider = $model->search(\Yii::$app->request->get());
+        $dataProvider = $model->search(array_merge(\Yii::$app->request->get(), $params));
         return $this->render('log', [
             'model' => $model,
-            'dataProvider' => $dataProvider
+            'dataProvider' => $dataProvider,
+            'statisticFilter' => $statisticFilter,
+            'data' => $data,
         ]);
     }
 
     public function actionTest() {
         //LogRecord::register('sdsdf', 'dfgfd', 'ru');
+//        $logs = LogRecord::find()->all();
+//        if (!empty($logs)) {
+//            foreach ($logs as $log) {
+//                $log->setScenario('update');
+//                $log->deeplink = DeeplinkRecord::removeSuffix($log->deeplink);
+//                $log->save();
+//            }
+//        }
     }
 
 }

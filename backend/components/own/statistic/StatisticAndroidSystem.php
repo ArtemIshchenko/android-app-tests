@@ -47,7 +47,7 @@ class StatisticAndroidSystem
         $endTime = mktime(23, 59, 59, date('m', $to), date('d', $to), date('Y', $to));
 
         $countLogs = LogRecord::find()
-            ->select(['c' => 'COUNT(DISTINCT tt_logs.id)', 'name' => 'tt_deeplinks.name'])
+            ->select(['c' => 'COUNT(DISTINCT tt_logs.device_id)', 'name' => 'tt_deeplinks.name'])
             ->innerJoin('tt_deeplinks', "tt_logs.deeplink = tt_deeplinks.name")
             ->where(['BETWEEN', 'tt_logs.created_at', $startTime, $endTime])
             ->andWhere(['token' => ''])
@@ -56,8 +56,14 @@ class StatisticAndroidSystem
             ->asArray()
             ->all();
 
+        $countWithoutDeep = LogRecord::find()
+            ->where(['BETWEEN', 'created_at', $startTime, $endTime])
+            ->andWhere(['deeplink' => ''])
+            ->andWhere(['token' => ''])
+            ->count('DISTINCT device_id');
 
-        return $countLogs;
+
+        return ['countLogs' => $countLogs, 'countWithoutDeep' => $countWithoutDeep];
     }
 
     protected static function _logs2(StatisticAndroidFilter $statisticFilter)
@@ -71,17 +77,11 @@ class StatisticAndroidSystem
         $startTime = mktime(0, 0, 0, date('m', $from), date('d', $from), date('Y', $from));
         $endTime = mktime(23, 59, 59, date('m', $to), date('d', $to), date('Y', $to));
 
-        $countLogs = LogRecord::find()
-            ->select(['c' => 'COUNT(DISTINCT tt_logs.id)', 'name' => 'tt_deeplinks.name'])
-            ->innerJoin('tt_deeplinks', "tt_logs.deeplink = tt_deeplinks.name")
-            ->where(['BETWEEN', 'tt_logs.created_at', $startTime, $endTime])
-            ->andWhere(['<>', 'token', ''])
-            ->groupBy('tt_deeplinks.name')
-            ->orderBy(['c' => SORT_DESC])
-            ->asArray()
-            ->all();
+        $countLogs = 0;
+
+        $countWithoutDeep = 0;
 
 
-        return $countLogs;
+        return ['countLogs' => $countLogs, 'countWithoutDeep' => $countWithoutDeep];
     }
 }

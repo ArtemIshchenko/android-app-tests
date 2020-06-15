@@ -288,11 +288,11 @@ class TestController extends BackController
 
     /**
      * @property-description Логи
-     * @param integer $type
+     * @param integer $t
      */
-    public function actionLog($type = 0) {
+    public function actionLog($t = 0) {
         $params = [];
-        switch($type) {
+        switch($t) {
             case 0:
                 $params = ['type' => 0];
                 break;
@@ -304,7 +304,7 @@ class TestController extends BackController
         $statisticFilter->load(\Yii::$app->request->get());
         //$pageSize = $statisticFilter->pageSize;
 
-        $data = StatisticAndroidSystem::logs($statisticFilter, $type);
+        $data = StatisticAndroidSystem::logs($statisticFilter, $t);
         $dateTimestamp = $statisticFilter->getDateTimestamp();
         $params['dateFrom'] = $dateTimestamp['dateFrom'];
         $params['dateTo'] = $dateTimestamp['dateTo'];

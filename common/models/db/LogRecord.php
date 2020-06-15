@@ -112,6 +112,9 @@ class LogRecord extends ActiveRecord
         } else {
             $query->andWhere(['token' => '']);
         }
+        $query->groupBy('device_id');
+
+
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

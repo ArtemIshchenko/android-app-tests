@@ -10,7 +10,7 @@ use common\models\db\DeeplinkRecord;
 $this->title = 'Логи';
 $this->params['breadcrumbs'][] = $this->title;
 $addButton = '<div class="clearfix"></div><div class="ptop10"></div>';
-$type = \Yii::$app->request->get('type',0);
+$type = \Yii::$app->request->get('t',0);
 ?>
 <div class="pall10"></div>
 <div class="content">
@@ -20,12 +20,12 @@ $type = \Yii::$app->request->get('type',0);
             'items' => [
                 [
                     'label' => 'Получение теста',
-                    'url' => Url::toRoute(['test/log', 'type' => 0]),
+                    'url' => Url::toRoute(['test/log', 't' => 0]),
                     'active' => $type == 0 ? true : false,
                 ],
                 [
                     'label' => 'Установка пуша',
-                    'url' => Url::toRoute(['test/log', 'type' => 1]),
+                    'url' => Url::toRoute(['test/log', 't' => 1]),
                     'active' => $type == 1 ? true : false,
                 ],
             ],
@@ -37,23 +37,26 @@ $type = \Yii::$app->request->get('type',0);
 
         <?= $this->render('_filters', [
             'statisticFilter' => $statisticFilter,
-            'url' => Url::toRoute(['test/log']),
+            'url' => Url::toRoute(['test/log', 't' => $type]),
             'useTime' => true,
             'field' => ['dateRange'],
             'excludeField' => ['pageSize'],
         ]) ?>
         <div class="pall10"></div>
-        <?php foreach ($data as $i => $item) {
-            $label = 'label-success';
-            if (($i+1) % 2 == 0) {
-                $label = 'label-info';
-            } elseif (($i+1) % 3 == 0) {
-                $label = 'label-warning';
-            } elseif (($i+1) % 4 == 0) {
-                $label = 'label-danger';
-            }
-            ?>
-            <div><span class="label <?= $label ?>"><?= $item['name'] ?>:</span> - <?= $item['c'] ?></div>
+        <?php if ($type == 0) { ?>
+            <?php foreach ($data['countLogs'] as $i => $item) {
+                $label = 'label-success';
+                if (($i+1) % 2 == 0) {
+                    $label = 'label-info';
+                } elseif (($i+1) % 3 == 0) {
+                    $label = 'label-warning';
+                } elseif (($i+1) % 4 == 0) {
+                    $label = 'label-danger';
+                }
+                ?>
+                <div><span class="label <?= $label ?>"><?= $item['name'] ?>:</span> - <?= $item['c'] ?></div>
+            <?php } ?>
+                <div><span class="label label-success">Уникальных без дипа:</span> - <?= $data['countWithoutDeep'] ?></div>
         <?php } ?>
         <div class="pall10"></div>
         <div class="tab-content">

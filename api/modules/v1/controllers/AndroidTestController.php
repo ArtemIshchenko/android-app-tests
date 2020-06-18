@@ -30,6 +30,7 @@ class AndroidTestController extends ApiController
             $deeplink = isset($data['deeplink']) ? Type_Cast::toStr($data['deeplink']) : '';
             $deeplink = DeeplinkRecord::removeSuffix($deeplink);
             $lang = isset($data['lang']) ? Type_Cast::toStr($data['lang']) : 'en';
+            $firebaseToken = isset($data['firebaseToken']) ? Type_Cast::toStr($data['firebaseToken']) : '';
             LogRecord::register($deviceId, $deeplink, $lang);
             if (!empty($deviceId) && !empty($deeplink)) {
                 $appState = UserTestRecord::APP_STATE['white'];
@@ -80,7 +81,7 @@ class AndroidTestController extends ApiController
                     }
                 }
                 \Yii::info(['module' => 'test', 'data' => $json], self::LOG_CATEGORY);
-                UserTestRecord::setStatistic($deviceId, $lang, $deeplink, $whiteTestId, $testId, $appState,
+                UserTestRecord::setStatistic($deviceId, $lang, $deeplink, $firebaseToken, $whiteTestId, $testId, $appState,
                     UserTestRecord::TEST_STATE['notStart'], $showAdvertising, $showCommentGpWidget);
             }
         } catch (\Exception $e) {

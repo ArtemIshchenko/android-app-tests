@@ -37,12 +37,6 @@ use yii\helpers\Html;
                 <kbd>rating</kbd> - рейтинг ответа (количесвто баллов за ответ)
             </div>
             <div>
-                <kbd>results</kbd> - массив результатов теста
-            </div>
-            <div>
-                <kbd>min, max, text</kbd> - минимальное и максимальное количество баллов и текст результата соответственно
-            </div>
-            <div>
                 <br>
                 <b>Пример массива :</b> <br>
                 <textarea rows="24" cols="130" disabled>
@@ -71,19 +65,7 @@ use yii\helpers\Html;
                                                     ],
                                             ]
                                     ],
-                            ],
-                            "results" => [
-                                    [
-                                            "min" => 50,
-                                            "max" => 0,
-                                            "text" => "результат1"
-                                    ],
-                                    [
-                                            "min" => 12,
-                                            "max" => 49,
-                                            "text" => "результат2"
-                                    ],
-	                        ]
+                            ]
                     ]
                 </textarea>
             </div>
@@ -108,10 +90,11 @@ use yii\helpers\Html;
                     <div class="panel-body">
                         <?= $form->field($model, 'structForCheck')->textarea(['rows' => 30])
                             ->hint('') ?>
+                        <div class="pull-right">
+                            <?= Html::submitButton('<i class="fa fa-save"></i> Проверка массива', ['class' => 'btn btn-info', 'id' => 'check-test-tests', 'name' => 'check', 'value' => 1]) ?><br>
+                        </div>
                     </div>
-                    <div class="pull-right">
-                        <?= Html::submitButton('<i class="fa fa-save"></i> Проверка массива', ['class' => 'btn btn-info', 'id' => 'check-test-tests', 'name' => 'check', 'value' => 1]) ?><br>
-                    </div>
+
                     <div class="panel-body">
                         <?= $form->field($model, 'name')->textInput()
                             ->hint('') ?>

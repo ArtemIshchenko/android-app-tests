@@ -6,6 +6,7 @@ use common\components\own\generate\Generate;
 use librariesHelpers\helpers\Type\Type_Cast;
 use yii\data\ActiveDataProvider;
 use yii\behaviors\TimestampBehavior;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class DeeplinkRecord
@@ -173,6 +174,11 @@ class DeeplinkRecord extends ActiveRecord
         $suffix = 'com.thousandstests://';
         $deeplink = str_replace($suffix, "", $deeplink);
         return $deeplink;
+    }
+
+    public static function deeplinkList()
+    {
+        return ArrayHelper::map(self::find()->orderBy(['name' => SORT_ASC])->all(), 'id', 'name');
     }
 
 }

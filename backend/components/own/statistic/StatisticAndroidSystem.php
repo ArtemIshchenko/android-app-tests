@@ -77,7 +77,14 @@ class StatisticAndroidSystem
         $startTime = mktime(0, 0, 0, date('m', $from), date('d', $from), date('Y', $from));
         $endTime = mktime(23, 59, 59, date('m', $to), date('d', $to), date('Y', $to));
 
-        $countLogs = 0;
+        $countLogs = LogRecord::find()
+            ->select(['c' => 'COUNT(DISTINCT device_id)', 'test_id'])
+            ->where(['BETWEEN', 'created_at', $startTime, $endTime])
+            ->andWhere(['<>', 'token', ''])
+            ->groupBy('test_id')
+            ->orderBy(['c' => SORT_DESC])
+            ->asArray()
+            ->all();
 
         $countWithoutDeep = 0;
 

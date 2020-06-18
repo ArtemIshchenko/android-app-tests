@@ -108,7 +108,7 @@ $type = \Yii::$app->request->get('t',0);
                             'format' => 'raw',
                             'hidden' => $type == 0,
                             'value' => function($model){
-                                return '<div>' . $model->token . '</div>';
+                                return '<div style="word-wrap: break-word; width: 830px;">' . $model->token . '</div>';
                             }
                         ],
                         [

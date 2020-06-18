@@ -18,6 +18,7 @@ use yii\helpers\ArrayHelper;
  * @property string $device_id
  * @property string $lang
  * @property string $deeplink
+ * @property string $firebase_token
  * @property integer $app_test_id
  * @property integer $test_id
  * @property integer $app_state
@@ -63,7 +64,7 @@ class UserTestRecord extends ActiveRecord
         return [
             [['device_id'], 'required', 'on' => ['add', 'update']],
             [['device_id'], 'unique', 'targetAttribute' => ['device_id'], 'on' => ['add', 'update']],
-            [['device_id', 'lang', 'deeplink'], 'string', 'on' => ['add', 'update']],
+            [['device_id', 'lang', 'deeplink', 'firebase_token'], 'string', 'on' => ['add', 'update']],
             [['app_test_id', 'test_id', 'app_state', 'test_state', 'show_ads_state', 'show_rating_state'], 'integer', 'on' => ['add', 'update']],
             [['app_test_id', 'test_id'], 'default', 'value' => 0, 'on' => ['add']],
             [['app_state'], 'default', 'value' => self::APP_STATE['white'], 'on' => ['add']],
@@ -94,6 +95,7 @@ class UserTestRecord extends ActiveRecord
             'device_id' => 'Ид устройства, используется для идентификации пользователя',
             'lang' => 'Язык устройства',
             'deeplink' => 'Диплинк пользователя',
+            'firebase_token' => 'Токен Firebase',
             'app_test_id' => 'Ид белого теста',
             'test_id' => 'Ид серого теста',
             'app_state' => 'Сотояние приложения',
@@ -117,18 +119,33 @@ class UserTestRecord extends ActiveRecord
      * @param integer $showRatingState
      * @return bool
      */
-    public static function setStatistic($deviceId, $lang, $deeplink, $whiteTestId, $testId, $appState, $testState, $showAdsState, $showRatingState) {
-        $userTest = new self;
-        $userTest->setScenario('add');
-        $userTest->device_id = $deviceId;
-        $userTest->lang = $lang;
-        $userTest->deeplink = $deeplink;
-        $userTest->app_test_id = $whiteTestId;
-        $userTest->test_id = $testId;
-        $userTest->app_state = $appState;
-        $userTest->test_state = $testState;
-        $userTest->show_ads_state = $showAdsState;
-        $userTest->show_rating_state = $showRatingState;
+    public static function setStatistic($deviceId, $lang, $deeplink, $firebaseToken, $whiteTestId, $testId, $appState, $testState, $showAdsState, $showRatingState) {
+        $userTest = self::findOne(['device_id' => $deviceId]);
+        if (!is_null($userTest) && !empty($userTest)) {
+            $userTest->setScenario('update');
+            $userTest->lang = $lang;
+            $userTest->deeplink = $deeplink;
+            $userTest->firebase_token = $firebaseToken;
+            $userTest->app_test_id = $whiteTestId;
+            $userTest->test_id = $testId;
+            $userTest->app_state = $appState;
+            $userTest->test_state = $testState;
+            $userTest->show_ads_state = $showAdsState;
+            $userTest->show_rating_state = $showRatingState;
+        } else {
+            $userTest = new self;
+            $userTest->setScenario('add');
+            $userTest->device_id = $deviceId;
+            $userTest->lang = $lang;
+            $userTest->deeplink = $deeplink;
+            $userTest->firebase_token = $firebaseToken;
+            $userTest->app_test_id = $whiteTestId;
+            $userTest->test_id = $testId;
+            $userTest->app_state = $appState;
+            $userTest->test_state = $testState;
+            $userTest->show_ads_state = $showAdsState;
+            $userTest->show_rating_state = $showRatingState;
+        }
 
         return $userTest->save();
     }

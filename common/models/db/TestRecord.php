@@ -196,6 +196,7 @@ class TestRecord extends ActiveRecord
         return [
             'id' => '#',
             'name' => 'Наименование',
+            'structForCheck' => 'Структура для проверки',
             'structure' => 'Структура',
             'is_active' => 'Статус',
             'created_at' => 'Дата создания',
@@ -257,10 +258,13 @@ class TestRecord extends ActiveRecord
             $structureId = isset($structure['id']) ? $structure['id'] : '';
             $content .= "\t" . '"id" => ' . $structureId . ",\n";
             $title = isset($structure['title']) ? $structure['title'] : '';
+            $title = str_replace('"', '\"', $title);
             $content .= "\t" . '"title" => "' . $title . "\",\n";
             $description = isset($structure['description']) ? $structure['description'] : '';
+            $description = str_replace('"', '\"', $description);
             $content .= "\t" . '"description" => "' . $description . "\",\n";
             $imageAnswer = isset($structure['imageAnswer']) ? $structure['imageAnswer'] : '';
+            $imageAnswer = str_replace('"', '\"', $imageAnswer);
             $content .= "\t" . '"imageAnswer" => "' . $imageAnswer . "\",\n";
             $timerSetting = isset($structure['timerSetting']) ? $structure['timerSetting'] : 0;
             $content .= "\t" . '"timerSetting" => ' . $timerSetting . ",\n";
@@ -272,6 +276,7 @@ class TestRecord extends ActiveRecord
                     $questionNumber = isset($question['number']) ? $question['number'] : '';
                     $content .= "\t\t\t" . '"number" => ' . $questionNumber . ",\n";
                     $questionText = isset($question['text']) ? $question['text'] : '';
+                    $questionText = str_replace('"', '\"', $questionText);
                     $content .= "\t\t\t" . '"text" => "' . $questionText . "\",\n";
 
                     $content .= "\t\t\t" . '"answers" => ' . "[\n";
@@ -281,6 +286,7 @@ class TestRecord extends ActiveRecord
                             $answerNumber = isset($answer['number']) ? $answer['number'] : '';
                             $content .= "\t\t\t\t\t" . '"number" => ' . $answerNumber . ",\n";
                             $answerText = isset($answer['text']) ? $answer['text'] : '';
+                            $answerText = str_replace('"', '\"', $answerText);
                             $content .= "\t\t\t\t\t" . '"text" => "' . $answerText . "\",\n";
                             $answerIsSignal = isset($answer['isSignal']) ? $answer['isSignal'] : false;
                             $content .= "\t\t\t\t\t" . '"isSignal" => ' . $answerIsSignal . ",\n";
@@ -325,4 +331,21 @@ class TestRecord extends ActiveRecord
         return self::APP_TESTS;
     }
 
+    /**
+     * @description Серые тесты
+     * @return array
+     */
+    public static function getGreyTestList() {
+        $tests = [];
+        $testModels = self::find()->where(['is_active' => self::IS_ACTIVE])->orderBy(['id' => SORT_ASC])->all();
+        if (!is_null($testModels) && !empty($testModels)) {
+            foreach ($testModels as $testModel) {
+                $structure = $testModel->getStructure();
+                if (!empty($structure)) {
+                    $tests[$structure['id']] = $structure['title'];
+                }
+            }
+        }
+        return $tests;
+    }
 }

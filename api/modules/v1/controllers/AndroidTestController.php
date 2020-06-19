@@ -40,6 +40,7 @@ class AndroidTestController extends ApiController
                     'description' => '',
                     'imageAnswer' => '',
                     'timerSetting' => 0,
+                    'fbEvent' => '',
                     'questions' => [
                         [
                             'number' => 0,
@@ -57,10 +58,13 @@ class AndroidTestController extends ApiController
                 ];
                 $showAdvertising = SettingRecord::getValByName('showAdvertising', SettingRecord::SECTION['main']);
                 $showCommentGpWidget = SettingRecord::getValByName('showCommentGpWidget', SettingRecord::SECTION['main']);
-                $json = ['result' => 'successful', 'structure' => $structureInit, 'whiteTestId' => 0, 'url' => '', 'mode' => 0, 'appState' => $appState, 'showAdvertising' => $showAdvertising, 'showCommentGpWidget' => $showCommentGpWidget];
+                $json = ['result' => 'successful', 'structure' => $structureInit, 'image' => '', 'imageName' => '', 'fbEvent' => 0, 'whiteTestId' => 0, 'url' => '', 'mode' => 0, 'appState' => $appState, 'showAdvertising' => $showAdvertising, 'showCommentGpWidget' => $showCommentGpWidget];
                 $deeplinkModel = DeeplinkRecord::findOne(['name' => $deeplink, 'is_active' => DeeplinkRecord::IS_ACTIVE]);
                 $testId = 0;
                 $whiteTestId = 0;
+                $image = '';
+                $imageName = '';
+                $fbEvent = 0;
                 $structure = [];
                 if (!is_null($deeplinkModel) && !empty($deeplinkModel)) {
                     if ($deeplinkModel->mode != DeeplinkRecord::MODE['warming']) {
@@ -68,6 +72,11 @@ class AndroidTestController extends ApiController
                         if (!is_null($test) && !empty($test)) {
                             $testId = $test->id;
                         }
+                        if (!empty($test->image)) {
+                            $image = TestRecord::getImageUrl($test->image);
+                            $imageName = $test->image;
+                        }
+                        $fbEvent = $test->fb_event;
                         $structure = $test->getStructure();
                         $appState = UserTestRecord::APP_STATE['grey'];
                     } else {
@@ -77,7 +86,7 @@ class AndroidTestController extends ApiController
                     }
 
                     if (!empty($structure)) {
-                        $json = ['result' => 'successful', 'structure' => $structure, 'whiteTestId' => $whiteTestId, 'url' => $deeplinkModel->url, 'mode' => $deeplinkModel->mode, 'appState' => $appState, 'showAdvertising' => $showAdvertising, 'showCommentGpWidget' => $showCommentGpWidget];
+                        $json = ['result' => 'successful', 'structure' => $structure, 'image' => $image, 'imageName' => $imageName, 'fbEvent' => $fbEvent, 'whiteTestId' => $whiteTestId, 'url' => $deeplinkModel->url, 'mode' => $deeplinkModel->mode, 'appState' => $appState, 'showAdvertising' => $showAdvertising, 'showCommentGpWidget' => $showCommentGpWidget];
                     }
                 }
                 \Yii::info(['module' => 'test', 'data' => $json], self::LOG_CATEGORY);

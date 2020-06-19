@@ -5,6 +5,7 @@ use common\models\db\DeeplinkRecord;
 use common\models\db\TestRecord;
 use common\models\db\SettingRecord;
 use common\models\db\LogRecord;
+use common\components\own\generate\Generate;
 use backend\components\own\baseController\BackController;
 use backend\models\form\StatisticAndroidFilter;
 use backend\components\own\statistic\StatisticAndroidSystem;
@@ -68,8 +69,30 @@ class TestController extends BackController
             }
 
             if ($model->load(\Yii::$app->request->post())) {
+                if (!empty($_FILES)) {
+                    $destination = \Yii::$app->params['testPathDir'];
+                    $fileTempName = $_FILES['TestRecord']['tmp_name']['image'];
+                    if (is_uploaded_file($fileTempName)) {
+                        $file = $_FILES['TestRecord']['name']['image'];
+                        $exp = explode(".", $file);
+                        $ext = end($exp);
+                        $fileHash = mt_rand(1, 9999) . Generate::generateMixCode();
+                        $newFilename = $destination . '/' . $fileHash . '.' . $ext;
+                        //Перемещаем файл из временной папки в указанную
+                        if (move_uploaded_file($fileTempName, $newFilename)) {
+                            $model->image = $fileHash . '.' . $ext;
+                        } else {
+                            echo 'Не удалось осуществить сохранение файла';
+                            exit;
+                        }
+                    }
+                }
+
                 if ($model->save()) {
                     $this->redirect(Url::toRoute(['test/tests', 'type' => $type]));
+                } elseif (!empty($model->image)) {
+                    @unlink(\Yii::$app->params['testPathDir'] . '/' . $model->image);
+                    $model->image = '';
                 }
             }
         } else {
@@ -98,8 +121,40 @@ class TestController extends BackController
                 throw new HttpException(404, "Тест не найден", 404);
             }
             $model->setScenario('update');
+            $savedImg = $model->image;
             if ($model->load(\Yii::$app->request->post())) {
+                if (!empty($_FILES)) {
+                    $destination = \Yii::$app->params['testPathDir'];
+                    $fileTempName = $_FILES['TestRecord']['tmp_name']['image'];
+                    if (is_uploaded_file($fileTempName)) {
+                        $file = $_FILES['TestRecord']['name']['image'];
+                        $exp = explode(".", $file);
+                        $ext = end($exp);
+                        $fileHash = mt_rand(1, 9999) . Generate::generateMixCode();
+                        $newFilename = $destination . '/' . $fileHash . '.' . $ext;
+                        //Перемещаем файл из временной папки в указанную
+                        if (move_uploaded_file($fileTempName, $newFilename)) {
+                            if (!empty($savedImg)) {
+                                $oldImage = $savedImg;
+                            }
+                            $model->image = $fileHash . '.' . $ext;
+                        } else {
+                            echo 'Не удалось осуществить сохранение файла';
+                            exit;
+                        }
+                    }
+                }
+                $isDeleteImg = \Yii::$app->request->post('isDeleteImg', false);
+                if (!empty($savedImg) && empty($model->image) && !$isDeleteImg) {
+                    $model->image = $savedImg;
+                }
                 if ($model->save()) {
+                    if(!empty($oldImage)) {
+                        @unlink(\Yii::$app->params['testPathDir'] . '/' . $oldImage);
+                    }
+                    if (!empty($savedImg) && $isDeleteImg) {
+                        @unlink(\Yii::$app->params['testPathDir'] . '/' . $savedImg);
+                    }
                     $this->redirect(Url::toRoute(['test/tests', 'type' => $type]));
                 }
             }
@@ -111,6 +166,35 @@ class TestController extends BackController
         }
 
         return $this->render('test-update', ['model' => $model]);
+    }
+
+    /**
+     * @property-description Скачивание файла
+     * @param int $id
+     * @return string
+     */
+    public function actionDownload($id=0)
+    {
+        $model =TestRecord::findOne($id);
+        $downloadFile = \Yii::$app->params['testPathDir'] . '/' . $model->image;
+        if (file_exists($downloadFile)) {
+            // сбрасываем буфер вывода PHP, чтобы избежать переполнения памяти выделенной под скрипт
+            // если этого не сделать файл будет читаться в память полностью!
+            if (ob_get_level()) {
+                ob_end_clean();
+            }
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename=' . basename($downloadFile));
+            header('Content-Transfer-Encoding: binary');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate');
+            header('Pragma: public');
+            header('Content-Length: ' . filesize($downloadFile));
+            // читаем файл и отправляем его пользователю
+            readfile($downloadFile);
+            exit;
+        }
     }
 
     /**

@@ -1,5 +1,6 @@
 <?php
 use yii\helpers\Html;
+use common\models\db\TestRecord;
 
 ?>
 <div class="content">
@@ -98,6 +99,25 @@ use yii\helpers\Html;
                     <div class="panel-body">
                         <?= $form->field($model, 'name')->textInput()
                             ->hint('') ?>
+
+                        <?= $form->field($model, 'image')->fileInput()->hint('') ?>
+
+                        <?php if(!empty($model->image)):?>
+                            <div class="form-group field-test-img">
+                                <label class="col-lg-3 control-label" for="test-img">&nbsp;</label>
+                                <div class="col-lg-9">
+                                    <div><img style="width: 200px;" src="<?=\Yii::$app->params['testWebDir'].$model->image?>"></div>
+                                    <?php if (Yii::$app->rbacManager->checkAccess('test/download')) { ?>
+                                        <div class="pall10"></div>
+                                        <div><a href="<?=\yii\helpers\Url::toRoute(['test/download', 'id' => $model->id])?>">Скачать</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<?= Html::label(Html::checkbox('isDeleteImg') . ' Удалить', null, ['style' => 'font-weight: 100;']) ?></div>
+                                    <?php } ?>
+                                </div>
+                                <div class="col-sm-offset-3 col-lg-9"><div class="help-block"></div></div>
+                            </div>
+                        <?php endif; ?>
+
+                        <?= $form->field($model, 'fb_event')->dropDownList(TestRecord::getFbEventList(), ['class' => 'form-control', 'prompt' => 'Выберите значение']) ?>
+
                         <?= $form->field($model, 'structure')->textarea(['rows' => 30])
                             ->hint('') ?>
 

@@ -17,6 +17,8 @@ use yii\helpers\ArrayHelper;
  * @property integer $id
  * @property string $name
  * @property string $structure
+ * @property string $image
+ * @property integer $fb_event
  * @property integer $is_active
  * @property integer $created_at
  * @property integer $updated_at
@@ -26,6 +28,15 @@ class TestRecord extends ActiveRecord
 
     const IS_NOT_ACTIVE = 0;
     const IS_ACTIVE = 1;
+
+    const FB_EVENT = [
+        'achieveLevel' => 1,
+        'adClick' => 2,
+        'adImpression' => 3,
+        'addPaymentInfo' => 4,
+        'completeRegistration' => 7,
+        'contact' => 9,
+    ];
 
     const APP_TESTS = [
         1 => 'В ПОРЯДКЕ ЛИ ВАШИ НЕРВЫ?',
@@ -64,13 +75,29 @@ class TestRecord extends ActiveRecord
         return [
             [['name', 'structure'], 'required', 'enableClientValidation' => false, 'on' => ['add', 'update']],
             [['name'], 'string', 'max' => 256, 'on' => ['add', 'update']],
-            [['structure'], 'string', 'on' => ['add', 'update']],
+            [['structure', 'image'], 'string', 'on' => ['add', 'update']],
+            [['image'], 'checkImgResolution', 'on' => ['add', 'update']],
             [['structure'], 'convStruct', 'on' => ['add', 'update']],
             [['structForCheck'], 'checkStruct', 'on' => ['check']],
-            [['is_active'], 'integer', 'on' => ['add', 'update']],
+            [['is_active', 'fb_event'], 'integer', 'on' => ['add', 'update']],
             [['is_active'], 'default', 'value' => self::IS_ACTIVE, 'on' => ['add']],
+            [['fb_event'], 'default', 'value' => 0, 'on' => ['add']],
             [['is_active'], 'integer', 'on' => ['change-active']],
         ];
+    }
+
+    public function checkImgResolution($attribute, $params) {
+        if ($this->scenario != 'change-active') {
+            if (!empty($this->$attribute)) {
+                $img = \Yii::$app->params['testPathDir'] . '/' . $this->$attribute;
+                $size = getimagesize($img);
+                if ($size) {
+                    if (($size[0] > 300) || ($size[1] > 300)) {
+                        $this->addError($attribute, 'Размер изображения должен быть не более 300х300 px');
+                    }
+                }
+            }
+        }
     }
 
     public function checkStruct($attribute, $params) {
@@ -198,6 +225,8 @@ class TestRecord extends ActiveRecord
             'name' => 'Наименование',
             'structForCheck' => 'Структура для проверки',
             'structure' => 'Структура',
+            'image' => 'Изображение',
+            'fb_event' => 'Стандартное событие фейсбук',
             'is_active' => 'Статус',
             'created_at' => 'Дата создания',
             'updated_at' => 'Дата обновления',
@@ -347,5 +376,33 @@ class TestRecord extends ActiveRecord
             }
         }
         return $tests;
+    }
+
+    /**
+     * @description Стандартные события фейсбук
+     * @return array
+     */
+    public static function getFbEventList() {
+        return [
+            self::FB_EVENT['achieveLevel'] => 'Achieve Level',
+            self::FB_EVENT['adClick'] => 'Ad Click',
+            self::FB_EVENT['adImpression'] => 'Ad Impression',
+            self::FB_EVENT['addPaymentInfo'] => 'Add Payment Info',
+            self::FB_EVENT['completeRegistration'] => 'Complete Registration',
+            self::FB_EVENT['contact'] => 'Contact',
+        ];
+    }
+
+    /**
+     * @description Url картинки
+     * @param string $name
+     * @return string
+     */
+    public static function getImageUrl($name) {
+        $destination = \Yii::$app->params['testWebDir'];
+        if (substr($destination, -1) != '/') {
+            $destination .= '/';
+        }
+        return $destination . $name;
     }
 }

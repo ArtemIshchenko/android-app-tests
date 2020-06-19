@@ -45,6 +45,9 @@ class AdmAccess
         if ($this->_checkAccess('test/setting')) {
             array_push($dataMenu, ['label' => '<i class="fa fa-sliders"></i> Настройки', 'url' => ['test/setting']]);
         }
+        if ($this->_checkAccess('push/index')) {
+            array_push($dataMenu, ['label' => '<i class="fa fa-paper-plane-o"></i> Управление пушами', 'url' => ['push/index']]);
+        }
         if ($this->_checkAccess('test/log')) {
             array_push($dataMenu, ['label' => '<i class="fa fa-pencil"></i> Логи', 'url' => ['test/log']]);
         }

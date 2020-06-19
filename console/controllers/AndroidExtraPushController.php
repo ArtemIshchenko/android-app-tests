@@ -11,7 +11,7 @@ use yii\console\Controller;
 class AndroidExtraPushController extends Controller
 {
 
-    const MAX_PUSH_PROCESS = 5;
+    const MAX_PUSH_PROCESS = 3;
     const MAX_USER_SEND = 30;
     const MAX_USER_AT_ONE_REQUEST = 10;
 
@@ -29,7 +29,7 @@ class AndroidExtraPushController extends Controller
 
         $setUserPushes = SetUserPushRecord::find()
             ->where(['is_handler' => SetUserPushRecord::NOT_IS_HANDLER])
-            //->andWhere(['<', 'push_at', time()])
+            ->andWhere(['<', 'push_at', time()])
             ->orderBy(['id' => SORT_ASC])
             ->limit(self::MAX_PUSH_PROCESS)
             ->all();
@@ -71,21 +71,26 @@ class AndroidExtraPushController extends Controller
                 if(is_array($results) && !empty($results)) {
                     $tokens = [];
                     $resultsCount = count($results);
-                    foreach ($results as $i => $result) {
-                        $tokens[$result['id']] = $result['firebase_token'];
-                        if ((($i + 1) >= self::MAX_USER_AT_ONE_REQUEST) || (($i + 1) >= $resultsCount)) {
-                            if (!empty($tokens)) {
-                                $sendParams = self::prepareSendMessageMulty($tokens, $title, $text);
-                                $sendResult = $this->sendMessageMulty($sendParams);
-                                if (is_array($sendResult) && !empty($sendResult)) {
-                                    foreach ($sendResult as $userId => $sr) {
-                                        if (isset($sr['response']) && ($sr['response']['success'] == 1)) {
-                                            UserPushStatisticRecord::setStatistic($userId, $setUserPush->id);
+                    $i = 0;
+                    foreach ($results as $result) {
+                        if (!empty($result['firebase_token'])) {
+                            $tokens[$result['id']] = $result['firebase_token'];
+                            if ((($i + 1) >= self::MAX_USER_AT_ONE_REQUEST) || (($i + 1) >= $resultsCount)) {
+                                if (!empty($tokens)) {
+                                    $sendParams = self::prepareSendMessageMulty($tokens, $title, $text);
+                                    $sendResult = $this->sendMessageMulty($sendParams);
+                                    if (is_array($sendResult) && !empty($sendResult)) {
+                                        foreach ($sendResult as $userId => $sr) {
+                                            if (isset($sr['response']) && ($sr['response']['success'] == 1)) {
+                                                UserPushStatisticRecord::setStatistic($userId, $setUserPush->id);
+                                            }
                                         }
                                     }
+                                    $tokens = [];
+                                    $i = -1;
                                 }
                             }
-                            $tokens = [];
+                            ++$i;
                         }
                     }
                 } else {

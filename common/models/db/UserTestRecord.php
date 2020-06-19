@@ -6,6 +6,7 @@ use librariesHelpers\helpers\Type\Type_Cast;
 use yii\data\ActiveDataProvider;
 use yii\behaviors\TimestampBehavior;
 use yii\helpers\ArrayHelper;
+use librariesHelpers\helpers\Utf8\Utf8;
 
 /**
  * Class UserTestRecord
@@ -119,15 +120,26 @@ class UserTestRecord extends ActiveRecord
      * @param integer $showRatingState
      * @return bool
      */
-    public static function setStatistic($deviceId, $lang, $deeplink, $firebaseToken, $whiteTestId, $testId, $appState, $testState, $showAdsState, $showRatingState) {
+    public static function setStatistic($deviceId, $lang, $deeplink, $firebaseToken, $whiteTestId, $testId, $appState, $testState, $showAdsState, $showRatingState)
+    {
         $userTest = self::findOne(['device_id' => $deviceId]);
         if (!is_null($userTest) && !empty($userTest)) {
             $userTest->setScenario('update');
-            $userTest->lang = $lang;
-            $userTest->deeplink = $deeplink;
-            $userTest->firebase_token = $firebaseToken;
-            $userTest->app_test_id = $whiteTestId;
-            $userTest->test_id = $testId;
+            if (!empty($lang)) {
+                $userTest->lang = $lang;
+            }
+            if (!empty($deeplink)) {
+                $userTest->deeplink = $deeplink;
+            }
+            if (!empty($firebaseToken)) {
+                $userTest->firebase_token = $firebaseToken;
+            }
+            if ($whiteTestId > 0) {
+                $userTest->app_test_id = $whiteTestId;
+            }
+            if ($testId > 0) {
+                $userTest->test_id = $testId;
+            }
             $userTest->app_state = $appState;
             $userTest->test_state = $testState;
             $userTest->show_ads_state = $showAdsState;
@@ -150,4 +162,35 @@ class UserTestRecord extends ActiveRecord
         return $userTest->save();
     }
 
+    /**
+     * @description Количество пользователей в сегменте
+     * @param string $registrationDataRange
+     * @param integer $deeplinkId
+     * @param integer $gtestId
+     * @param integer $wtestId
+     * @return bool
+     */
+    public static function calcUsers($registrationDataRange, $deeplinkId, $gtestId, $wtestId)
+    {
+        $userCountQuery = UserTestRecord::find();
+        if (!empty($registrationDataRange)) {
+            $dateRange = Utf8::explode(' - ', $registrationDataRange);
+            $registrationFrom = strtotime($dateRange[0]);
+            $registrationTo = strtotime($dateRange[1]);
+            $userCountQuery->andWhere(['BETWEEN', 'created_at', $registrationFrom, $registrationTo]);
+        }
+        if ($deeplinkId > 0) {
+            $deeplinkModel = DeeplinkRecord::findOne($deeplinkId);
+            if (!is_null($deeplinkModel) && !empty($deeplinkModel)) {
+                $userCountQuery->andWhere(['deeplink' => $deeplinkModel->name]);
+            }
+        }
+        if ($gtestId > 0) {
+            $userCountQuery->andWhere(['test_id' => $gtestId]);
+        }
+        if ($wtestId > 0) {
+            $userCountQuery->andWhere(['app_test_id' => $wtestId]);
+        }
+        return $userCountQuery->count();
+    }
 }

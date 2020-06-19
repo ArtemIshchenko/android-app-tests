@@ -57,26 +57,8 @@ class PushController extends BackController
             $deeplink_id = \Yii::$app->request->get('deeplink_id',0);
             $gtest_id = \Yii::$app->request->get('gtest_id',0);
             $wtest_id = \Yii::$app->request->get('wtest_id',0);
-            $userCountQuery = UserTestRecord::find();
-            if (!empty($registrationDataRange)) {
-                $dateRange = Utf8::explode(' - ', $registrationDataRange);
-                $registrationFrom = strtotime($dateRange[0]);
-                $registrationTo = strtotime($dateRange[1]);
-                $userCountQuery->where(['BETWEEN', 'created_at', $registrationFrom, $registrationTo]);
-            }
-            if ($deeplink_id > 0) {
-                $deeplinkModel = DeeplinkRecord::findOne($deeplink_id);
-                if (!is_null($deeplinkModel) && !empty($deeplinkModel)) {
-                    $userCountQuery->where(['deeplink' => $deeplinkModel->name]);
-                }
-            }
-            if ($gtest_id > 0) {
-                $userCountQuery->where(['test_id' => $gtest_id]);
-            }
-            if ($wtest_id > 0) {
-                $userCountQuery->where(['app_test_id' => $wtest_id]);
-            }
-            $userCount = $userCountQuery->count();
+
+            $userCount = UserTestRecord::calcUsers($registrationDataRange, $deeplink_id, $gtest_id, $wtest_id);
             $json = ['result' => 'success', 'count' => $userCount];
             return $json;
         }
@@ -101,6 +83,7 @@ class PushController extends BackController
             if (!is_numeric($model->push_at)) {
                 $model->push_at = strtotime($model->push_at);
             }
+            $model->count_users = UserTestRecord::calcUsers($model->registrationDataRange, $model->deeplink_id, $model->gtest_id, $model->wtest_id);
             if ($model->save()) {
                 $this->redirect(Url::toRoute(['index', 'type' => $type]));
             }
@@ -108,7 +91,7 @@ class PushController extends BackController
         if ($model->registration_from > 0) {
             $model->registrationDataRange = date('d-m-Y H:i', $model->registration_from) . ' - ' . date('d-m-Y H:i', $model->registration_to);
         }
-        $model->push_at = date('d-m-Y H:i', time() + 86400);
+        $model->push_at = date('d-m-Y H:i', time());
 
         return $this->render('add', ['model' => $model, 'type' => $type]);
     }
@@ -120,7 +103,7 @@ class PushController extends BackController
 
         $setUserPushes = SetUserPushRecord::find()
             ->where(['is_handler' => SetUserPushRecord::NOT_IS_HANDLER])
-            //->andWhere(['<', 'push_at', time()])
+            ->andWhere(['<', 'push_at', time()])
             ->orderBy(['id' => SORT_ASC])
             ->limit(5)
             ->all();

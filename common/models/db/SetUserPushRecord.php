@@ -23,6 +23,7 @@ use yii\helpers\ArrayHelper;
  * @property string $title
  * @property string $text
  * @property integer $push_at
+ * @property integer $count_users
  * @property integer $is_handler
  * @property integer $created_at
  * @property integer $updated_at
@@ -48,8 +49,8 @@ class SetUserPushRecord extends ActiveRecord
             [['title'], 'string', 'max' => 256, 'on' => ['add']],
             [['text'], 'string', 'max' => 512, 'on' => ['add']],
             [['registrationDataRange'], 'string', 'on' => ['add']],
-            [['deeplink_id', 'gtest_id', 'wtest_id', 'registration_from', 'registration_to', 'is_handler'], 'integer', 'on' => ['add']],
-            [['deeplink_id', 'gtest_id', 'wtest_id', 'registration_from', 'registration_to', 'is_handler'], 'default', 'value' => 0, 'on' => ['add']],
+            [['deeplink_id', 'gtest_id', 'wtest_id', 'registration_from', 'registration_to', 'count_users', 'is_handler'], 'integer', 'on' => ['add']],
+            [['deeplink_id', 'gtest_id', 'wtest_id', 'registration_from', 'registration_to', 'count_users', 'is_handler'], 'default', 'value' => 0, 'on' => ['add']],
             [['push_at'], 'datetime', 'min' => time(), 'minString' => date('d-m-Y H:i'), 'format' => 'd-M-yyyy H:m', 'timestampAttribute' => 'push_at', 'on' => ['add']],
             [['is_handler'], 'integer', 'on' => ['set-handler']],
         ];
@@ -82,6 +83,7 @@ class SetUserPushRecord extends ActiveRecord
             'title' => 'Заголовок',
             'text' => 'Текст',
             'push_at' => 'Дата и время пуша',
+            'count_users' => 'Количество пользователей',
             'is_handler' => 'Обработан',
             'created_at' => 'Дата создания',
             'updated_at' => 'Дата обновления',

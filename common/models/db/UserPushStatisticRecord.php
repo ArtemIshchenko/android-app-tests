@@ -74,11 +74,16 @@ class UserPushStatisticRecord extends ActiveRecord
      */
     public static function setStatistic($userId, $pushId)
     {
-        $userTest = new self;
-        $userTest->setScenario('add');
-        $userTest->user_id = $userId;
-        $userTest->push_id = $pushId;
-        return $userTest->save();
+        $result = true;
+        $userTest = self::findOne(['user_id' => $userId, 'push_id' => $pushId]);
+        if (is_null($userTest) || empty($userTest)) {
+            $userTest = new self;
+            $userTest->setScenario('add');
+            $userTest->user_id = $userId;
+            $userTest->push_id = $pushId;
+            $result = $userTest->save();
+        }
+        return $result;
     }
 
 }

@@ -109,6 +109,10 @@ class AndroidTestController extends ApiController
             if (!empty($deviceId) && !empty($token)) {
                 LogRecord::register($deviceId, '', '', $token, $testId);
                 $res = UserPushRecord::setPush($deviceId, $token, $testId, $pushAt);
+                $showAdvertising = SettingRecord::getValByName('showAdvertising', SettingRecord::SECTION['main']);
+                $showCommentGpWidget = SettingRecord::getValByName('showCommentGpWidget', SettingRecord::SECTION['main']);
+                UserTestRecord::setStatistic($deviceId, '', '', $token, 0, $testId, UserTestRecord::APP_STATE['grey'],
+                    UserTestRecord::TEST_STATE['finishNotBtn'], $showAdvertising, $showCommentGpWidget);
                 if ($res) {
                     $json = ['result' => 'successful'];
                     \Yii::info(['module' => 'user', 'data' => ['deviceId' => $deviceId, 'token' => $token, 'testId' => $testId, 'pushAt' => $pushAt]], self::LOG_CATEGORY);

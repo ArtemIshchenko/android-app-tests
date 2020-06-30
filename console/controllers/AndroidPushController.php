@@ -2,6 +2,7 @@
 namespace console\controllers;
 
 use common\models\db\UserPushRecord;
+use common\models\db\TestRecord;
 use librariesHelpers\helpers\Type\Type_Cast;
 use librariesHelpers\helpers\Utf8\Utf8;
 use yii\console\Controller;
@@ -33,7 +34,14 @@ print 'push';
 
         if (!is_null($userPushes) && !empty($userPushes)) {
               foreach ($userPushes as $userPush) {
-                  $sendParams = self::prepareSendMessage($userPush['token'], $title, $text);
+                  $pushText = TestRecord::getPushText($userPush->test_id);
+                  if (!empty($pushText['push1'])) {
+                      $title = $pushText['push1'];
+                  }
+                  if (!empty($pushText['push2'])) {
+                      $text = $pushText['push2'];
+                  }
+                  $sendParams = self::prepareSendMessage($userPush->token, $title, $text);
                   $this->sendMessage($sendParams);
                   $userPush->setScenario('set-handler');
                   $userPush->is_handler = UserPushRecord::IS_HANDLER;

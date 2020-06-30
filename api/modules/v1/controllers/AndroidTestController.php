@@ -38,9 +38,12 @@ class AndroidTestController extends ApiController
                     'id' => 0,
                     'title' => '',
                     'description' => '',
+                    'docData' => '',
                     'imageAnswer' => '',
                     'timerSetting' => 0,
                     'fbEvent' => '',
+                    'push1' => '',
+                    'push2' => '',
                     'questions' => [
                         [
                             'number' => 0,
@@ -71,14 +74,14 @@ class AndroidTestController extends ApiController
                         $test = TestRecord::findOne(['id' => $deeplinkModel->test_id, 'is_active' => TestRecord::IS_ACTIVE]);
                         if (!is_null($test) && !empty($test)) {
                             $testId = $test->id;
+                            if (!empty($test->image)) {
+                                $image = TestRecord::getImageUrl($test->image);
+                                $imageName = $test->image;
+                            }
+                            $fbEvent = $test->fb_event;
+                            $structure = $test->getStructure();
+                            $appState = UserTestRecord::APP_STATE['grey'];
                         }
-                        if (!empty($test->image)) {
-                            $image = TestRecord::getImageUrl($test->image);
-                            $imageName = $test->image;
-                        }
-                        $fbEvent = $test->fb_event;
-                        $structure = $test->getStructure();
-                        $appState = UserTestRecord::APP_STATE['grey'];
                     } else {
                         $structure = $structureInit;
                         $appState = UserTestRecord::APP_STATE['white'];

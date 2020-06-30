@@ -92,8 +92,8 @@ class TestRecord extends ActiveRecord
                 $img = \Yii::$app->params['testPathDir'] . '/' . $this->$attribute;
                 $size = getimagesize($img);
                 if ($size) {
-                    if (($size[0] > 300) || ($size[1] > 300)) {
-                        $this->addError($attribute, 'Размер изображения должен быть не более 300х300 px');
+                    if (($size[0] > 200) || ($size[1] > 200)) {
+                        $this->addError($attribute, 'Размер изображения должен быть не более 200х200 px');
                     }
                 }
             }
@@ -129,11 +129,35 @@ class TestRecord extends ActiveRecord
                     if (!isset($structure['id']) || empty($structure['id'])) {
                         $this->addError($attribute, 'Неверная структура массива - заполните поле id теста');
                     }
+
+                    $testList = self::getGreyTests(false);
+                    if (!is_null($testList) && !empty($testList)) {
+                        foreach ($testList as $testId => $str) {
+                            if ($this->scenario == 'add') {
+                                if ($str['id'] == $structure['id']) {
+                                    $this->addError($attribute, 'Тест с таким id в структуре уже существует');
+                                    break;
+                                }
+                            } elseif ($this->scenario == 'update') {
+                                if (($this->id != $testId) && ($str['id'] == $structure['id'])) {
+                                    $this->addError($attribute, 'Тест с таким id в структуре уже существует');
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (isset($testList[$structure['id']])) {
+                        $this->addError($attribute, 'Тест с таким id уже существует');
+                    }
+
                     if (!isset($structure['title']) || empty($structure['title'])) {
                         $this->addError($attribute, 'Неверная структура массива - заполните поле title теста');
                     }
                     if (!isset($structure['description']) || empty($structure['description'])) {
                         $this->addError($attribute, 'Неверная структура массива - заполните поле description теста');
+                    }
+                    if (!isset($structure['docData'])) {
+                        $this->addError($attribute, 'Неверная структура массива - добавьте поле docData теста');
                     }
                     if (!isset($structure['questions']) || empty($structure['questions'])) {
                         $this->addError($attribute, 'Неверная структура массива - заполните поле questions теста');
@@ -143,6 +167,12 @@ class TestRecord extends ActiveRecord
                     }
                     if (!isset($structure['timerSetting']) || empty($structure['timerSetting'])) {
                         $this->addError($attribute, 'Неверная структура массива - заполните поле timerSetting теста');
+                    }
+                    if (!isset($structure['push1'])) {
+                        $this->addError($attribute, 'Неверная структура массива - добавьте поле push1 теста');
+                    }
+                    if (!isset($structure['push2'])) {
+                        $this->addError($attribute, 'Неверная структура массива - добавьте поле push2 теста');
                     }
 //                    if (!isset($structure['results']) || empty($structure['results'])) {
 //                        $this->addError($attribute, 'Неверная структура массива - заполните поле results теста');
@@ -292,11 +322,20 @@ class TestRecord extends ActiveRecord
             $description = isset($structure['description']) ? $structure['description'] : '';
             $description = str_replace('"', '\"', $description);
             $content .= "\t" . '"description" => "' . $description . "\",\n";
+            $docData = isset($structure['docData']) ? $structure['docData'] : '';
+            $docData = str_replace('"', '\"', $docData);
+            $content .= "\t" . '"docData" => "' . $docData . "\",\n";
             $imageAnswer = isset($structure['imageAnswer']) ? $structure['imageAnswer'] : '';
             $imageAnswer = str_replace('"', '\"', $imageAnswer);
             $content .= "\t" . '"imageAnswer" => "' . $imageAnswer . "\",\n";
             $timerSetting = isset($structure['timerSetting']) ? $structure['timerSetting'] : 0;
             $content .= "\t" . '"timerSetting" => ' . $timerSetting . ",\n";
+            $push1 = isset($structure['push1']) ? $structure['push1'] : '';
+            $push1 = str_replace('"', '\"', $push1);
+            $content .= "\t" . '"push1" => "' . $push1 . "\",\n";
+            $push2 = isset($structure['push2']) ? $structure['push2'] : '';
+            $push2 = str_replace('"', '\"', $push2);
+            $content .= "\t" . '"push2" => "' . $push2 . "\",\n";
 
             $content .= "\t" . '"questions" => ' . "[\n";
             if (isset($structure['questions']) && !empty($structure['questions'])) {
@@ -364,9 +403,13 @@ class TestRecord extends ActiveRecord
      * @description Серые тесты
      * @return array
      */
-    public static function getGreyTestList() {
+    public static function getGreyTestList($activite = true) {
         $tests = [];
-        $testModels = self::find()->where(['is_active' => self::IS_ACTIVE])->orderBy(['id' => SORT_ASC])->all();
+        if ($activite) {
+            $testModels = self::find()->where(['is_active' => self::IS_ACTIVE])->orderBy(['id' => SORT_ASC])->all();
+        } else {
+            $testModels = self::find()->orderBy(['id' => SORT_ASC])->all();
+        }
         if (!is_null($testModels) && !empty($testModels)) {
             foreach ($testModels as $testModel) {
                 $structure = $testModel->getStructure();
@@ -376,6 +419,53 @@ class TestRecord extends ActiveRecord
             }
         }
         return $tests;
+    }
+
+    /**
+     * @description Серые тесты
+     * @return array
+     */
+    public static function getGreyTests($activite = true) {
+        $tests = [];
+        if ($activite) {
+            $testModels = self::find()->where(['is_active' => self::IS_ACTIVE])->orderBy(['id' => SORT_ASC])->all();
+        } else {
+            $testModels = self::find()->orderBy(['id' => SORT_ASC])->all();
+        }
+        if (!is_null($testModels) && !empty($testModels)) {
+            foreach ($testModels as $testModel) {
+                $structure = $testModel->getStructure();
+                if (!empty($structure)) {
+                    $tests[$testModel->id] = $structure;
+                }
+            }
+        }
+        return $tests;
+    }
+
+    /**
+     * @description Заголовок и тест пуша
+     * @param int testId
+     * @return array
+     */
+    public static function getPushText($testId) {
+        $result = ['push1' => '', 'push2' => ''];
+        $testModels = self::find()->where(['is_active' => self::IS_ACTIVE])->orderBy(['id' => SORT_ASC])->all();
+        if (!is_null($testModels) && !empty($testModels)) {
+            foreach ($testModels as $testModel) {
+                $structure = $testModel->getStructure();
+                if (!empty($structure) && isset($structure['id']) && ($structure['id'] == $testId)) {
+                    if (isset($structure['push1']) && !empty($structure['push1'])) {
+                        $result['push1'] = $structure['push1'];
+                    }
+                    if (isset($structure['push2']) && !empty($structure['push2'])) {
+                        $result['push2'] = $structure['push2'];
+                    }
+                    break;
+                }
+            }
+        }
+        return $result;
     }
 
     /**

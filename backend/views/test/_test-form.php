@@ -11,13 +11,19 @@ use common\models\db\TestRecord;
                 Обозначения обязательных полей в массиве :
             </div>
             <div>
-                <kbd>id, title, description</kbd> - идентификатор (целое число, по порядку), заголовок и описание теста соответственно
+                <kbd>id, title, description, docData</kbd> - идентификатор (целое число, по порядку), заголовок, описание теста и docData соответственно
             </div>
             <div>
                 <kbd>imageAnswer</kbd> - вариант ответа для имиджевого режима, а также если не выбран ни один "сигнальный" ответ
             </div>
             <div>
                 <kbd>timerSetting</kbd> - уставка таймера для отображения кнопки результатов, сек
+            </div>
+            <div>
+                <kbd>push1</kbd> - заголовок пуша
+            </div>
+            <div>
+                <kbd>push2</kbd> - описание пуша
             </div>
             <div>
                 <kbd>questions</kbd> - массив вопросов теста
@@ -45,8 +51,11 @@ use common\models\db\TestRecord;
                             "id" => 1,
                             "title" => "тест",
                             "description" => "описание",
+                            "docData" => "описание",
                             "imageAnswer" => "Вариант ответа для имиджевого режима",
                             "timerSetting" => 3700,
+                            "push1" => "Заголовок пуша",
+                            "push2" => "Описание пуша",
                             "questions" => [
                                     [
                                             "number" => 1,

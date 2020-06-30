@@ -83,13 +83,17 @@ class UserPushRecord extends ActiveRecord
      * @return bool
      */
     public static function setPush($deviceId, $token, $testId, $pushAt) {
-        $userPush = new self;
-        $userPush->setScenario('add');
-        $userPush->device_id = $deviceId;
-        $userPush->token = $token;
-        $userPush->test_id = $testId;
-        $userPush->push_at = $pushAt;
-        $userPush->is_handler = 0;
-        return $userPush->save();
+        $userPush = self::findOne(['device_id' => $deviceId, 'test_id' => $testId, 'is_handler' => 0]);
+        if (is_null($userPush) || empty($userPush)) {
+            $userPush = new self;
+            $userPush->setScenario('add');
+            $userPush->device_id = $deviceId;
+            $userPush->token = $token;
+            $userPush->test_id = $testId;
+            $userPush->push_at = $pushAt;
+            $userPush->is_handler = 0;
+            return $userPush->save();
+        }
+        return true;
     }
 }

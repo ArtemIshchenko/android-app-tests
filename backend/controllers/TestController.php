@@ -285,6 +285,7 @@ class TestController extends BackController
         $model->setScenario('white-add');
         $model->app_test_id = 0;
         $model->test_id = 0;
+        $model->chatlist_id = 0;
         $model->url = '';
         $model->description = '';
         switch($type) {

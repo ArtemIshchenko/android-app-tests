@@ -18,6 +18,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $id
  * @property integer $test_id
  * @property integer $app_test_id
+ * @property integer $chatlist_id
  * @property string $deeplink_hash
  * @property string $name
  * @property string $description
@@ -53,13 +54,13 @@ class DeeplinkRecord extends ActiveRecord
             [['deeplink_hash', 'name'], 'required', 'on' => ['white-add', 'white-update', 'grey-add', 'grey-update']],
             [['app_test_id'], 'required', 'enableClientValidation' => false, 'on' => ['white-add', 'white-update']],
             [['test_id'], 'required', 'enableClientValidation' => false, 'on' => ['grey-add', 'grey-update']],
-            [['app_test_id', 'test_id'], 'integer', 'on' => ['white-add', 'white-update', 'grey-add', 'grey-update']],
+            [['app_test_id', 'test_id', 'chatlist_id'], 'integer', 'on' => ['white-add', 'white-update', 'grey-add', 'grey-update']],
             [['name', 'description'], 'string', 'max' => 256, 'on' => ['white-add', 'white-update', 'grey-add', 'grey-update']],
             [['url', 'deeplink_hash'], 'string', 'on' => ['white-add', 'white-update', 'grey-add', 'grey-update']],
             [['name', 'description', 'url'], 'trim', 'on' => ['white-add', 'white-update', 'grey-add', 'grey-update']],
             [['url'], 'url', 'validSchemes' => ['https', 'http'], 'on' => ['white-add', 'white-update', 'grey-add', 'grey-update']],
             [['is_active', 'mode'], 'integer', 'on' => ['white-add', 'white-update', 'grey-add', 'grey-update']],
-            [['test_id', 'app_test_id'], 'default', 'value' => 0, 'on' => ['white-add', 'grey-add']],
+            [['test_id', 'app_test_id', 'chatlist_id'], 'default', 'value' => 0, 'on' => ['white-add', 'grey-add']],
             [['is_active'], 'default', 'value' => self::IS_ACTIVE, 'on' => ['white-add', 'grey-add']],
             [['mode'], 'default', 'value' => self::MODE['warming'], 'on' => ['white-add', 'grey-add']],
             [['is_active'], 'integer', 'on' => ['change-active']],
@@ -85,6 +86,7 @@ class DeeplinkRecord extends ActiveRecord
             'id' => '#',
             'test_id' => 'Серый тест',
             'app_test_id' => 'Белый тест',
+            'chatlist_id' => 'Список чат-сообщений на странице результата',
             'deeplink_hash' => 'Хеш диплинка',
             'name' => 'Наименование',
             'description' => 'Описание',
@@ -171,7 +173,7 @@ class DeeplinkRecord extends ActiveRecord
      * @return string
      */
     public static function removeSuffix($deeplink) {
-        $suffix = 'com.thousandstests://';
+        $suffix = ['com.thousandstests://', 'com.goodtests://'];
         $deeplink = str_replace($suffix, "", $deeplink);
         return $deeplink;
     }

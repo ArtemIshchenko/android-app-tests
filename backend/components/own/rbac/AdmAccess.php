@@ -42,6 +42,9 @@ class AdmAccess
         if ($this->_checkAccess('test/tests')) {
             array_push($dataMenu, ['label' => '<i class="fa fa-list"></i> Тесты', 'url' => ['test/tests']]);
         }
+        if ($this->_checkAccess('chat-message/index')) {
+            array_push($dataMenu, ['label' => '<i class="fa fa-server"></i> Чат-сообщения', 'url' => ['chat-message/index']]);
+        }
         if ($this->_checkAccess('test/setting')) {
             array_push($dataMenu, ['label' => '<i class="fa fa-sliders"></i> Настройки', 'url' => ['test/setting']]);
         }

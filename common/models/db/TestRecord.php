@@ -174,6 +174,12 @@ class TestRecord extends ActiveRecord
                     if (!isset($structure['push2'])) {
                         $this->addError($attribute, 'Неверная структура массива - добавьте поле push2 теста');
                     }
+                    if (!isset($structure['vbBotUri'])) {
+                        $this->addError($attribute, 'Неверная структура массива - добавьте поле vbBotUri теста');
+                    }
+                    if (!isset($structure['vbBotDeeplink'])) {
+                        $this->addError($attribute, 'Неверная структура массива - добавьте поле vbBotDeeplink теста');
+                    }
 //                    if (!isset($structure['results']) || empty($structure['results'])) {
 //                        $this->addError($attribute, 'Неверная структура массива - заполните поле results теста');
 //                    }
@@ -336,6 +342,14 @@ class TestRecord extends ActiveRecord
             $push2 = isset($structure['push2']) ? $structure['push2'] : '';
             $push2 = str_replace('"', '\"', $push2);
             $content .= "\t" . '"push2" => "' . $push2 . "\",\n";
+
+            $vbBotUri = isset($structure['vbBotUri']) ? $structure['vbBotUri'] : '';
+            $vbBotUri = str_replace('"', '\"', $vbBotUri);
+            $content .= "\t" . '"vbBotUri" => "' . $vbBotUri . "\",\n";
+
+            $vbBotDeeplink = isset($structure['vbBotDeeplink']) ? $structure['vbBotDeeplink'] : '';
+            $vbBotDeeplink = str_replace('"', '\"', $vbBotDeeplink);
+            $content .= "\t" . '"vbBotDeeplink" => "' . $vbBotDeeplink . "\",\n";
 
             $content .= "\t" . '"questions" => ' . "[\n";
             if (isset($structure['questions']) && !empty($structure['questions'])) {

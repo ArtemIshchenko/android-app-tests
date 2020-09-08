@@ -193,4 +193,19 @@ class UserTestRecord extends ActiveRecord
         }
         return $userCountQuery->count();
     }
+
+    /**
+     * @description Наличие пользователя
+     * @param string $deviceId
+     * @param array $whiteList
+     * @return bool
+     */
+    public static function isHasUser($deviceId, $whiteList)
+    {
+        $result = false;
+        if (!in_array($deviceId, $whiteList) && UserTestRecord::find()->where(['device_id' => $deviceId])->exists()) {
+            $result = true;
+        }
+        return $result;
+    }
 }

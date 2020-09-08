@@ -2,8 +2,6 @@
 use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\web\JsExpression;
-use common\models\db\DeeplinkRecord;
-use common\models\db\TestRecord;
 use common\models\db\ChatMessageListRecord;
 
 ?>
@@ -29,22 +27,7 @@ use common\models\db\ChatMessageListRecord;
                         <?= $form->field($model, 'name')->textInput()
                             ->hint('') ?>
 
-                        <?= $form->field($model, 'description')->textarea()
-                            ->hint('') ?>
-
-                        <?= $form->field($model, 'url')->textInput()
-                            ->hint('') ?>
-
-                        <?= $form->field($model, 'test_id')->dropDownList(TestRecord::getTestList(), ['class' => 'form-control', 'prompt' => 'Выберите значение']) ?>
-
-                        <?= $form->field($model, 'app_test_id')->dropDownList(TestRecord::getAppTestList(), ['class' => 'form-control', 'prompt' => 'Выберите значение']) ?>
-
-                        <?= $form->field($model, 'chatlist_id')->dropDownList(ChatMessageListRecord::getList(), ['class' => 'form-control', 'prompt' => 'Выберите значение']) ?>
-
-                        <?= $form->field($model, 'is_active')->radioList(DeeplinkRecord::getStatus())
-                            ->hint('') ?>
-
-                        <?= $form->field($model, 'mode')->radioList(DeeplinkRecord::getModes())
+                        <?= $form->field($model, 'is_active')->radioList(ChatMessageListRecord::getStatus())
                             ->hint('') ?>
 
                     </div>
@@ -52,7 +35,7 @@ use common\models\db\ChatMessageListRecord;
 			</div>
 			<div class="panel-footer">
                 <div class="pull-right">
-					<?= Html::submitButton('<i class="fa fa-save"></i> Сохранить', ['class' => 'btn btn-info', 'id' => 'save-test-tests']) ?><br>
+					<?= Html::submitButton('<i class="fa fa-save"></i> Сохранить', ['class' => 'btn btn-info', 'id' => 'save-list-message']) ?><br>
 				</div>
 				<div class="clearfix"></div>
 			</div>

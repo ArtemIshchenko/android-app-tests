@@ -4,18 +4,17 @@ use kartik\grid\GridView;
 use yii\bootstrap\Nav;
 use yii\helpers\Html;
 use yii\helpers\Url;
-use common\models\db\TestRecord;
-use common\models\db\DeeplinkRecord;
 use common\models\db\ChatMessageListRecord;
+use common\models\db\ChatMessageRecord;
 
-$this->title = 'Диплинки';
+$this->title = 'Чат-сообщения';
 $this->params['breadcrumbs'][] = $this->title;
 
 $type = \Yii::$app->request->get('type',0);
 $addButton = '';
-if (Yii::$app->rbacManager->checkAccess('test/index')) {
+if (Yii::$app->rbacManager->checkAccess('chat-message/list-add')) {
     $addButton = '<div class="pull-right mtop20">';
-    $addButton .= Html::a('<i class="fa fa-plus"></i> Добавить', Url::toRoute(['test/deeplink-add', 'type' => $type]), ['class' => 'btn btn-success']);
+    $addButton .= Html::a('<i class="fa fa-plus"></i> Добавить', Url::toRoute(['chat-message/message-add', 'listId' => $listId, 'type' => $type]), ['class' => 'btn btn-success']);
     $addButton .= '</div>';
 }
 $addButton .= '<div class="clearfix"></div><div class="ptop10"></div>';
@@ -28,33 +27,18 @@ $addButton .= '<div class="clearfix"></div><div class="ptop10"></div>';
             'items' => [
                 [
                     'label' => 'Все',
-                    'url' => Url::toRoute(['test/index', 'type' => 0]),
+                    'url' => Url::toRoute(['chat-message/messages', 'id' => $listId, 'type' => 0]),
                     'active' => $type == 0 ? true : false,
                 ],
                 [
                     'label' => 'Активные',
-                    'url' => Url::toRoute(['test/index', 'type' => 1]),
+                    'url' => Url::toRoute(['chat-message/messages', 'id' => $listId, 'type' => 1]),
                     'active' => $type == 1 ? true : false,
                 ],
                 [
                     'label' => 'Не активные',
-                    'url' => Url::toRoute(['test/index', 'type' => 2]),
+                    'url' => Url::toRoute(['chat-message/messages', 'id' => $listId, 'type' => 2]),
                     'active' => $type == 2 ? true : false,
-                ],
-                [
-                    'label' => 'Прогревочные',
-                    'url' => Url::toRoute(['test/index', 'type' => 3]),
-                    'active' => $type == 3 ? true : false,
-                ],
-                [
-                    'label' => 'Имиджевые',
-                    'url' => Url::toRoute(['test/index', 'type' => 4]),
-                    'active' => $type == 4 ? true : false,
-                ],
-                [
-                    'label' => 'Боевые',
-                    'url' => Url::toRoute(['test/index', 'type' => 5]),
-                    'active' => $type == 5 ? true : false,
                 ],
             ],
             'encodeLabels' => false,
@@ -84,76 +68,39 @@ $addButton .= '<div class="clearfix"></div><div class="ptop10"></div>';
                             }
                         ],
                         [
-                            'attribute' => 'name',
+                            'attribute' => 'list_id',
                             'width' => '20%',
                             'format' => 'raw',
                             'value' => function($model){
-                                return '<div>' . $model->name . '</div>';
+                                return '<div>' . ChatMessageListRecord::getNameById($model->list_id) . '</div>';
                             }
                         ],
                         [
-                            'attribute' => 'description',
+                            'attribute' => 'text',
                             'width' => '20%',
                             'format' => 'raw',
                             'value' => function($model){
-                                return '<div>' . $model->description . '</div>';
+                                return '<div>' . $model->text . '</div>';
                             }
                         ],
                         [
-                            'attribute' => 'url',
+                            'attribute' => 'message_type',
                             'width' => '20%',
                             'format' => 'raw',
                             'value' => function($model){
-                                return '<div>' . $model->url . '</div>';
-                            }
-                        ],
-                        [
-                            'attribute' => 'test_id',
-                            'width' => '20%',
-                            'format' => 'raw',
-                            'value' => function($model){
-                                return '<div>' . TestRecord::getNameById($model->test_id) . '</div>';
-                            }
-                        ],
-                        [
-                            'attribute' => 'app_test_id',
-                            'width' => '20%',
-                            'format' => 'raw',
-                            'value' => function($model){
-                                $result = '';
-                                if (isset(TestRecord::APP_TESTS[$model->app_test_id])) {
-                                    $result = TestRecord::APP_TESTS[$model->app_test_id];
+                                $type = '';
+                                if (isset(ChatMessageRecord::getType()[$model->message_type])) {
+                                    $type = ChatMessageRecord::getType()[$model->message_type];
                                 }
-                                return '<div>' . $result . '</div>';
+                                return '<div>' . $type . '</div>';
                             }
                         ],
                         [
-                            'attribute' => 'chatlist_id',
+                            'attribute' => 'hold_time',
                             'width' => '20%',
                             'format' => 'raw',
                             'value' => function($model){
-                                $result = '';
-                                $chatList = ChatMessageListRecord::getList();
-                                if (!empty($chatList) && isset($chatList[$model->chatlist_id])) {
-                                    $result = $chatList[$model->chatlist_id];
-                                }
-                                return '<div>' . $result . '</div>';
-                            }
-                        ],
-                        [
-                            'attribute' => 'mode',
-                            'width' => '80px',
-                            'format' => 'raw',
-                            'value' => function($model){
-                                $label = '';
-                                if ($model->mode == DeeplinkRecord::MODE['warming']) {
-                                    $label = 'Прогревочный';
-                                } elseif ($model->mode == DeeplinkRecord::MODE['image']) {
-                                    $label = 'Имеджевый';
-                                } elseif ($model->mode == DeeplinkRecord::MODE['fighting']) {
-                                    $label = 'Боевой';
-                                }
-                                return '<div>' . $label . '</div>';
+                                return '<div>' . $model->hold_time . '</div>';
                             }
                         ],
                         [
@@ -166,8 +113,8 @@ $addButton .= '<div class="clearfix"></div><div class="ptop10"></div>';
                                 }else{
                                     $result = '<i class="fa fa-circle-o fa-2x"><i>';
                                 }
-                                if (Yii::$app->rbacManager->checkAccess('test/deeplink-change-active')) {
-                                    return '<a href="' . Url::toRoute(['/test/deeplink-change-active', 'id' => $model->id]) . '">' . $result . '</a>';
+                                if (Yii::$app->rbacManager->checkAccess('chat-message/message-change-active')) {
+                                    return '<a href="' . Url::toRoute(['/chat-message/message-change-active', 'id' => $model->id]) . '">' . $result . '</a>';
                                 }
                                 return $result;
                             }
@@ -184,11 +131,21 @@ $addButton .= '<div class="clearfix"></div><div class="ptop10"></div>';
                         [
                             'class' => ActionColumn::className(),
                             'contentOptions' => ['style' => 'width:40px;'],
-                            'template' => "{update}",
+                            'template' => "{update} {messages} {up} {down}",
                             'buttons' => [
-                                'update' => function($url, $model) use($type) {
-                                    if (Yii::$app->rbacManager->checkAccess('test/deeplink-update')) {
-                                        return '<a href="' . Url::toRoute(['/test/deeplink-update', 'id' => $model->id, 'type' => $type]) . '" class="fa fa-pencil fa-2x" title="Редактирование"></a>';
+                                'update' => function($url, $model) use($type, $listId) {
+                                    if (Yii::$app->rbacManager->checkAccess('chat-message/message-update')) {
+                                        return '<a href="' . Url::toRoute(['/chat-message/message-update', 'listId' => $listId, 'id' => $model->id, 'type' => $type]) . '" class="fa fa-pencil fa-2x" title="Редактирование"></a>';
+                                    }
+                                },
+                                'up' => function($url, $model) use($type, $listId) {
+                                    if (Yii::$app->rbacManager->checkAccess('chat-message/message-up')) {
+                                        return '<a href="' . Url::toRoute(['/chat-message/message-up', 'listId' => $listId, 'id' => $model->id, 'type' => $type]) . '" class="fa fa-arrow-up fa-2x" title="Вверх"></a>';
+                                    }
+                                },
+                                'down' => function($url, $model) use($type, $listId) {
+                                    if (Yii::$app->rbacManager->checkAccess('chat-message/message-down')) {
+                                        return '<a href="' . Url::toRoute(['/chat-message/message-down', 'listId' => $listId, 'id' => $model->id, 'type' => $type]) . '" class="fa fa-arrow-down fa-2x" title="Вниз"></a>';
                                     }
                                 },
                             ]

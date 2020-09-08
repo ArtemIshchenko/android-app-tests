@@ -28,6 +28,15 @@ return [
                 ],
                 [
                     'class' => 'yii\log\FileTarget',
+                    'categories' => ['android-chat-message'],
+                    'levels' => ['error', 'warning', 'info', 'trace', 'profile'],
+                    'logFile' => '@app/runtime/android-chat-message/log.log',
+                    'logVars' => [],
+                    'maxFileSize' => 1024 * 2,
+                    'maxLogFiles' => 20,
+                ],
+                [
+                    'class' => 'yii\log\FileTarget',
                     'levels' => ['error', 'warning', 'info', 'trace', 'profile'],
                 ],
             ],

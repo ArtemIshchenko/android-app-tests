@@ -26,6 +26,12 @@ use common\models\db\TestRecord;
                 <kbd>push2</kbd> - описание пуша
             </div>
             <div>
+                <kbd>vbBotUri</kbd> - URI Viber бота
+            </div>
+            <div>
+                <kbd>vbBotDeeplink</kbd> - Диплинк Viber бота
+            </div>
+            <div>
                 <kbd>questions</kbd> - массив вопросов теста
             </div>
             <div>
@@ -56,6 +62,8 @@ use common\models\db\TestRecord;
                             "timerSetting" => 3700,
                             "push1" => "Заголовок пуша",
                             "push2" => "Описание пуша",
+                            "vbBotUri" => "URI Viber бота",
+                            "vbBotDeeplink" => "Диплинк Viber бота",
                             "questions" => [
                                     [
                                             "number" => 1,
